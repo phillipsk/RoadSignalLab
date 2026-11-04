@@ -16,7 +16,14 @@
   "realCmtIntegration": false,
   "physicalDriveValidated": false,
   "batteryEnergyMeasured": false,
-  "remoteCi": "configured; current-source execution pending",
+  "remoteCi": {
+    "sourceCommit": "d1c8f9aa44d8fe3eed377bcaf6150e74e56e05be",
+    "mainRunUrl": "https://github.com/phillipsk/RoadSignalLab/actions/runs/41864024780",
+    "tagRunUrl": "https://github.com/phillipsk/RoadSignalLab/actions/runs/41864273168",
+    "statusAtPublication": "queued",
+    "statusDate": "2026-11-04",
+    "providerIncidentUrl": "https://www.githubstatus.com/incidents/xr3myzj7ms51"
+  },
   "openObservations": [
     {
       "area": "Android 16 Compose showcase test",
@@ -24,5 +31,9 @@
       "targetedRetry": "14 Android cases passed",
       "rootCause": "not established"
     }
-  ]
+  ],
+  "localReleaseBundle": {
+    "url": "https://github.com/phillipsk/RoadSignalLab/releases/download/v0.1.1/RoadSignalLab-0.1.1-local-example.zip",
+    "ciAttested": false
+  }
 }

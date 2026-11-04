@@ -35,6 +35,8 @@ API baseline updates are review operations: `./gradlew :telematics-core:updateLe
 
 ## Working conventions
 
+Public documentation covers SDK setup, behavior, validation and distribution. Store personal notes and draft material outside this repository. Keep local history archives outside the checkout and publish explicit current refs only.
+
 Small cohesive commits; no unrelated edits. Keep research facts in `docs/RESEARCH.md` with primary-source links and review date. Update implementation status, user journeys and tests when behavior changes. Run the instrumented classes in the order in `scripts/instrumented.sh`: cold-start testing intentionally consumes the showcase fixture. Never run these destructive fixture resets against a personal phone. No subagent/delegation requirement is imposed by this file.
 
 ## Release

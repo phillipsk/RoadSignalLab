@@ -1006,7 +1006,7 @@ gh attestation verify RoadSignalLab-0.1.1-debug.apk --repo phillipsk/RoadSignalL
 <h2>Automated capture</h2>
 <p><code>ShowcaseJourneyTest</code> captures native screenshots while executing synthetic flows. <code>ColdStartTest</code> checks persisted fixtures after a separate process launch. <code>DeviceAndPrivacyTest</code> verifies FGS lifecycle and deletion. Run them using <code>scripts/instrumented.sh</code>, which preserves their intended setup order. The saved PNGs are real emulator output; no image generator or fabricated vendor UI is used.</p>
 </section><section id="verification"><h1>Verification evidence</h1>
-<p>Verified locally on <strong>November 4, 2026</strong>. There are <strong>34 distinct test cases</strong>: 20 JVM behavior tests, 11 Android SDK tests, and 3 host tests. The Android cases passed on both devices below; do not count repeated device runs as additional distinct tests.</p>
+<p>Verified locally on <strong>November 4, 2026</strong>. There are <strong>34 distinct test cases</strong>: 20 JVM behavior tests, 11 Android SDK tests, and 3 host tests. For version 0.1.1, the Android suite passed on the API 36 device below; do not count repeated runs as additional distinct tests.</p>
 <table>
 <thead>
 <tr>
@@ -1020,12 +1020,8 @@ gh attestation verify RoadSignalLab-0.1.1-debug.apk --repo phillipsk/RoadSignalL
   <td>20 passed, zero failures/errors</td>
 </tr>
 <tr>
-  <td>Android 15 / API 35 / ARM64 / 4 KB pages</td>
-  <td>11 SDK tests + showcase, cold process and device/privacy tests passed</td>
-</tr>
-<tr>
   <td>Android 16 / API 36 / ARM64 / 16 KB pages</td>
-  <td>Same 14 Android cases passed</td>
+  <td>11 SDK tests + showcase, cold process and device/privacy tests passed</td>
 </tr>
 <tr>
   <td>Presentation refresh / Android 16 / 16 KB pages</td>
@@ -1091,7 +1087,9 @@ gh attestation verify RoadSignalLab-0.1.1-debug.apk --repo phillipsk/RoadSignalL
 </table>
 <p>The project intentionally targets SDK 36 while testing on newer hosts where available; lint can flag this relative to the latest platform. This is an explicit pinned prototype support decision, not a claim of the newest target-SDK policy compliance for a future Play submission. The manifest includes explicit backup/transfer exclusions. See <a href="https://github.com/phillipsk/RoadSignalLab/blob/main/docs/verification-evidence.json">machine-readable evidence</a> and <a href="https://github.com/phillipsk/RoadSignalLab/blob/main/docs/screenshots/capture-manifest.json">capture provenance</a>.</p>
 <h2>Remote execution</h2>
-<p>The CI workflow builds debug/minified apps, checks public APIs and manifests, consumes the published Maven artifacts, and runs all 14 Android cases on API 31/35/36 x86_64 emulators. The version-tag job builds and attests the exact release ZIP/APK before attaching them to the matching release. Results for the current source revision will be linked after execution. Configured jobs are not counted as passed tests.</p>
+<p>The <a href="https://github.com/phillipsk/RoadSignalLab/actions/runs/41864024780">main run</a> and <a href="https://github.com/phillipsk/RoadSignalLab/actions/runs/41864273168">v0.1.1 tag run</a> target source commit <code>d1c8f9aa44d8fe3eed377bcaf6150e74e56e05be</code>. They were queued at publication on November 4, 2026, while GitHub reported an <a href="https://www.githubstatus.com/incidents/xr3myzj7ms51">Actions/Pages incident</a>. Queued or configured jobs are not counted as passed tests.</p>
+<p>The workflow builds debug/minified apps, checks APIs/manifests, consumes the published Maven artifacts, and runs all 14 Android cases on API 31/35/36 x86_64 emulators. Its version-tag job builds and attests the exact release ZIP/APK before attaching them to the matching release. Inspect the current run result before claiming provenance exists for a CI artifact.</p>
+<p>The <a href="https://github.com/phillipsk/RoadSignalLab/releases/download/v0.1.1/RoadSignalLab-0.1.1-local-example.zip">local example bundle</a> is available separately. It contains locally verified source, native screenshots, technical docs, a debug APK and an 80-file Maven repository ZIP with checksums. It is a local build, not a signed CI attestation. CI-produced assets use separate canonical filenames.</p>
 <h2>UI-test stability observation</h2>
 <p>An API 36 showcase run previously failed with Compose's <code>Detected multithreaded access to SnapshotStateObserver</code> exception after all 11 SDK cases passed. A targeted retry passed all 14 Android cases. The root cause remains unestablished; a successful retry is not a fix or a measured flake rate. Further isolation should examine test-clock/draw synchronization and Compose/platform versions.</p>
 <h2>Scope limits</h2>

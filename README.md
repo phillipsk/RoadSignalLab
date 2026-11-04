@@ -8,6 +8,8 @@
 
 ## Run it
 
+The [local example bundle](https://github.com/phillipsk/RoadSignalLab/releases/download/v0.1.1/RoadSignalLab-0.1.1-local-example.zip) contains the debug APK, SDK Maven ZIP, source and technical guides. It passed local verification and is labeled separately from CI-attested artifacts.
+
 Open this directory in Android Studio, use JDK 21 for Gradle, and run **sample-app** on Android 8+ (API 26+). The tested build uses Gradle 8.13, AGP 8.13.2, Kotlin 2.3.10, compile/target SDK 36 and Java 17 bytecode. Versions are deliberately pinned rather than automatically tracking latest releases.
 
 ```sh

@@ -1,12 +1,11 @@
 # Verification evidence
 
-Verified locally on **November 4, 2026**. There are **34 distinct test cases**: 20 JVM behavior tests, 11 Android SDK tests, and 3 host tests. The Android cases passed on both devices below; do not count repeated device runs as additional distinct tests.
+Verified locally on **November 4, 2026**. There are **34 distinct test cases**: 20 JVM behavior tests, 11 Android SDK tests, and 3 host tests. For version 0.1.1, the Android suite passed on the API 36 device below; do not count repeated runs as additional distinct tests.
 
 | Check | Observed result |
 | --- | --- |
 | Core reducer/policy/retry tests | 20 passed, zero failures/errors |
-| Android 15 / API 35 / ARM64 / 4 KB pages | 11 SDK tests + showcase, cold process and device/privacy tests passed |
-| Android 16 / API 36 / ARM64 / 16 KB pages | Same 14 Android cases passed |
+| Android 16 / API 36 / ARM64 / 16 KB pages | 11 SDK tests + showcase, cold process and device/privacy tests passed |
 | Presentation refresh / Android 16 / 16 KB pages | 14 Android cases passed after the host footer update; 18 native captures refreshed at 1080×2424 |
 | Native screenshot capture | 18 final PNGs; no generated or altered UI images |
 | Actual location FGS | Became foreground with runtime permissions, then stopped; confirmed separately from SDK state |
@@ -27,7 +26,11 @@ The project intentionally targets SDK 36 while testing on newer hosts where avai
 
 ## Remote execution
 
-The CI workflow builds debug/minified apps, checks public APIs and manifests, consumes the published Maven artifacts, and runs all 14 Android cases on API 31/35/36 x86_64 emulators. The version-tag job builds and attests the exact release ZIP/APK before attaching them to the matching release. Results for the current source revision will be linked after execution. Configured jobs are not counted as passed tests.
+The [main run](https://github.com/phillipsk/RoadSignalLab/actions/runs/41864024780) and [v0.1.1 tag run](https://github.com/phillipsk/RoadSignalLab/actions/runs/41864273168) target source commit `d1c8f9aa44d8fe3eed377bcaf6150e74e56e05be`. They were queued at publication on November 4, 2026, while GitHub reported an [Actions/Pages incident](https://www.githubstatus.com/incidents/xr3myzj7ms51). Queued or configured jobs are not counted as passed tests.
+
+The workflow builds debug/minified apps, checks APIs/manifests, consumes the published Maven artifacts, and runs all 14 Android cases on API 31/35/36 x86_64 emulators. Its version-tag job builds and attests the exact release ZIP/APK before attaching them to the matching release. Inspect the current run result before claiming provenance exists for a CI artifact.
+
+The [local example bundle](https://github.com/phillipsk/RoadSignalLab/releases/download/v0.1.1/RoadSignalLab-0.1.1-local-example.zip) is available separately. It contains locally verified source, native screenshots, technical docs, a debug APK and an 80-file Maven repository ZIP with checksums. It is a local build, not a signed CI attestation. CI-produced assets use separate canonical filenames.
 
 ## UI-test stability observation
 
