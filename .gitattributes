@@ -1,0 +1,2 @@
+# Kotlin generates a trailing separator in its ABI dump. Preserve the generated format.
+telematics-core/api/*.api whitespace=-blank-at-eof

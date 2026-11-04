@@ -1,0 +1,28 @@
+{
+  "reviewDate": "2026-11-04",
+  "sdkVersion": "0.1.1",
+  "distinctTestCases": 34,
+  "coreJvmTests": 20,
+  "androidSdkTestsPerDevice": 11,
+  "hostJourneyTestsPerDevice": 3,
+  "currentLocalDevice": {
+    "api": 36,
+    "abi": "arm64-v8a",
+    "pageSizeBytes": 16384,
+    "resolution": "1080x2424",
+    "density": 420
+  },
+  "screenshots": 18,
+  "realCmtIntegration": false,
+  "physicalDriveValidated": false,
+  "batteryEnergyMeasured": false,
+  "remoteCi": "configured; current-source execution pending",
+  "openObservations": [
+    {
+      "area": "Android 16 Compose showcase test",
+      "observedFailure": "SnapshotStateObserver multithreaded-access exception",
+      "targetedRetry": "14 Android cases passed",
+      "rootCause": "not established"
+    }
+  ]
+}

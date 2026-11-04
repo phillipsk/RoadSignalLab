@@ -1,0 +1,170 @@
+{
+  "capturedOn": "2026-11-04",
+  "device": "Android 16/API 36 ARM64 emulator, 1080x2424, density 420, 16 KB pages; animations temporarily disabled during capture and restored.",
+  "method": "Unaltered Android UiAutomation native screenshots from the passing 14-case Android suite for SDK version 0.1.1.",
+  "cases": [
+    {
+      "file": "01-welcome.png",
+      "caption": "Welcome to the independent lab",
+      "mode": "presentation",
+      "width": 1080,
+      "height": 2424,
+      "sha256": "7fa9eb7648a6add82aac6651d2fcd9398d727c434b9c01d17a9d76007fc707d5",
+      "bytes": 116334
+    },
+    {
+      "file": "02-overview-consent-gate.png",
+      "caption": "Explore before consenting",
+      "mode": "consent-gate",
+      "width": 1080,
+      "height": 2424,
+      "sha256": "24234250b07d29b9047d5d2adaad78eecdf769b3f898f2414d4304d2a6e13669",
+      "bytes": 160082
+    },
+    {
+      "file": "03-consent-and-device-controls.png",
+      "caption": "Consent and a separate device-start choice",
+      "mode": "local-consent",
+      "width": 1080,
+      "height": 2424,
+      "sha256": "cdb9acd183e3506c66d638c81db4d28d0e36bf00eeca0865bdac90d3818f0491",
+      "bytes": 195118
+    },
+    {
+      "file": "04-trip-journal.png",
+      "caption": "A persisted synthetic trip",
+      "mode": "synthetic",
+      "width": 1080,
+      "height": 2424,
+      "sha256": "823c0051e861fe7721418a61d4ca8011e20e0b8784513111eed1106693927c4e",
+      "bytes": 144857
+    },
+    {
+      "file": "05-trip-detail.png",
+      "caption": "Route, distance and illustrative coaching",
+      "mode": "synthetic",
+      "width": 1080,
+      "height": 2424,
+      "sha256": "ca07cbc0e8988596d01ec23dd8d9a0d15683eeaa6777420dda1950eec01ae410",
+      "bytes": 147095
+    },
+    {
+      "file": "06-event-timeline-and-role.png",
+      "caption": "Events and explicit user role correction",
+      "mode": "synthetic",
+      "width": 1080,
+      "height": 2424,
+      "sha256": "8545b5dff722553816742d0b3157b7609fc694cd532652234176b339c466ddc5",
+      "bytes": 166429
+    },
+    {
+      "file": "07-power-model.png",
+      "caption": "Counterfactual lock ownership; no battery measurement",
+      "mode": "modeled",
+      "width": 1080,
+      "height": 2424,
+      "sha256": "20e8df4b070d213e7f00f016eae38be41467266cfbdb3cd2246a223dfe5b7b3e",
+      "bytes": 206562
+    },
+    {
+      "file": "08-sampling-policy.png",
+      "caption": "Local sampling-policy controls",
+      "mode": "local-policy",
+      "width": 1080,
+      "height": 2424,
+      "sha256": "a140576492fd5bfe010f11379d138072fac9aac333f54e1c4a6f52792f33bda7",
+      "bytes": 205722
+    },
+    {
+      "file": "09-offline-outbox.png",
+      "caption": "Queued local mock delivery",
+      "mode": "local-mock",
+      "width": 1080,
+      "height": 2424,
+      "sha256": "9554acb88de74dc9535b672a5e3882a3fb347f8c85d8b02cdc6be8d22801d499",
+      "bytes": 153445
+    },
+    {
+      "file": "10-local-acknowledgment.png",
+      "caption": "Durable local acknowledgment",
+      "mode": "local-mock",
+      "width": 1080,
+      "height": 2424,
+      "sha256": "cbd47c673b3c3587a0ebaac80ba4123a7433f7d9a60a3cff2f14700df3b1e952",
+      "bytes": 152901
+    },
+    {
+      "file": "11-distribution-pipeline.png",
+      "caption": "Contained artifact lifecycle",
+      "mode": "presentation",
+      "width": 1080,
+      "height": 2424,
+      "sha256": "2315d9102bf7f3ef5d60b0527a34312142a30d8778ba8d9d7e18fdd335cf7dbf",
+      "bytes": 200054
+    },
+    {
+      "file": "12-cmt-mock-boundary.png",
+      "caption": "Mock and unavailable vendor boundaries",
+      "mode": "cmt-mock",
+      "width": 1080,
+      "height": 2424,
+      "sha256": "6f4847e3c0ec3b34318c60719f37b6c1fcb830add496a89cd98e2a4769920dd0",
+      "bytes": 209849
+    },
+    {
+      "file": "13-gap-recovery-trips.png",
+      "caption": "Bad GPS rejection and long-gap segmentation",
+      "mode": "synthetic",
+      "width": 1080,
+      "height": 2424,
+      "sha256": "a14ef015ec4a6821c7071a00d1c3915ed2f9de396a5d17ad14508a6597b47b0d",
+      "bytes": 170042
+    },
+    {
+      "file": "14-impact-candidate-only.png",
+      "caption": "Synthetic impact candidate, no emergency action",
+      "mode": "synthetic",
+      "width": 1080,
+      "height": 2424,
+      "sha256": "67c2bdd6c451e2e0cf5b74bd7c2b94a5b40fb5e7f06de5c49a72cf117c4a37a4",
+      "bytes": 164935
+    },
+    {
+      "file": "15-bounded-diagnostics.png",
+      "caption": "Bounded diagnostics and hardware capability data",
+      "mode": "local-diagnostics",
+      "width": 1080,
+      "height": 2424,
+      "sha256": "6db68ea85e7d1ac06be7a336d8955fb30751a7a90cc9ae29ea9329ca1e2197f2",
+      "bytes": 182308
+    },
+    {
+      "file": "16-device-session-active.png",
+      "caption": "Actual foreground service; no physical-drive quality claim",
+      "mode": "device-service-lifecycle",
+      "width": 1080,
+      "height": 2424,
+      "sha256": "f6a06c71e2a8f8bfe3937cbf17f9154da1e0efeb57726bf04a31b57a327143a4",
+      "bytes": 176965
+    },
+    {
+      "file": "17-revoke-confirmation.png",
+      "caption": "Confirm local deletion",
+      "mode": "local-privacy",
+      "width": 1080,
+      "height": 2424,
+      "sha256": "cccac36f2bf6c260106571357be64d7dba36a370bab33732f73d408a5ac6d411",
+      "bytes": 163814
+    },
+    {
+      "file": "18-revoked-and-cleared.png",
+      "caption": "Consent disabled and local state cleared",
+      "mode": "local-privacy",
+      "width": 1080,
+      "height": 2424,
+      "sha256": "434e945de0b3719c18245579d4c18560f1737bfb2b8ab3c76a489b4c0ffcfe8e",
+      "bytes": 169620
+    }
+  ],
+  "sdkVersion": "0.1.1"
+}

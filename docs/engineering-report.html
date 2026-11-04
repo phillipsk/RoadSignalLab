@@ -1,0 +1,1099 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RoadSignal Lab · SDK engineering report</title><style>
+:root{--ink:#142d3b;--paper:#f4f5ef;--line:#dce1d8;--lime:#bce877}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}nav{position:fixed;inset:0 auto 0 0;width:250px;padding:30px 22px;background:var(--ink);color:#fff;overflow:auto}nav strong{font-size:23px;color:var(--lime)}nav a{display:block;color:#d9e7e3;font-size:13px;line-height:1.5;margin:15px 0;text-decoration:none}main{max-width:1320px;margin-left:250px;padding:42px 5vw 80px}header{border-bottom:1px solid var(--line);padding-bottom:30px}h1{font-size:36px;line-height:1.15;letter-spacing:-1px}h2{font-size:25px;margin-top:35px}h3{font-size:20px}a{color:#1d736d}section{scroll-margin-top:25px;background:#fff;border:1px solid var(--line);border-radius:24px;padding:28px;margin:28px 0}section h1{font-size:30px}table{display:block;overflow-x:auto;border-collapse:collapse;font-size:13px}th,td{border:1px solid var(--line);padding:10px;vertical-align:top}th{background:#e8eee1;text-align:left}pre{background:var(--ink);color:#e5efeb;padding:18px;border-radius:14px;overflow:auto;font:13px/1.7 ui-monospace,monospace}code{font-family:ui-monospace,monospace;font-size:.88em;overflow-wrap:anywhere}blockquote{border-left:4px solid var(--lime);margin:20px 0;padding:12px 20px;background:#edf2e7}.gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:26px}figure{margin:0;background:#fff;padding:12px;border-radius:20px;border:1px solid var(--line)}figure img{width:100%;height:auto;border-radius:10px}figcaption{font-size:12px;margin-top:9px;color:#5f716f}.eyebrow{color:#237a70;font-size:11px;letter-spacing:2px;font-weight:700}.pill{display:inline-block;background:var(--lime);padding:6px 14px;border-radius:30px;font-size:12px;font-weight:700}.small{font-size:13px;color:#5f716f}@media(max-width:850px){nav{position:static;width:auto}nav a{display:inline-block;margin:8px 12px 3px 0}main{margin:0;padding:24px 18px}.gallery{grid-template-columns:repeat(2,minmax(0,1fr))}section{padding:20px}h1{font-size:31px}}@media print{nav{display:none}main{margin:0;padding:0}section{break-before:page;border:0;padding:0}.gallery{grid-template-columns:repeat(3,1fr)}a{color:inherit}pre{white-space:pre-wrap}}
+</style></head><body><nav><strong>◉ roadsignal</strong><p class="small" style="color:#b9cdc6">Android SDK field lab</p><a href="#start-here">Getting started with RoadSignal Lab</a><a href="#implementation-status">What this project actually does</a><a href="#architecture">Architecture and execution model</a><a href="#sdk-api">SDK API and host integration</a><a href="#power-and-reliability">Power, capture quality and reliability</a><a href="#data-and-privacy">Data ownership, privacy and threat model</a><a href="#distribution">Distribution and compatibility</a><a href="#release-playbook">Release, activation and partner adoption</a><a href="#research">Research, evidence and design implications</a><a href="#user-journeys">Demo journeys and significance</a><a href="#verification">Verification evidence</a><a href="https://github.com/phillipsk/RoadSignalLab">GitHub source &amp; evidence ↗</a><a href="https://github.com/phillipsk/RoadSignalLab/blob/main/docs/RESEARCH.md">Primary-source research ledger ↗</a></nav><main><header><div class="eyebrow">ORIGINAL SDK · COMPOSE HOST · DISTRIBUTION LAB</div><h1>Understand the drive.<br>Own the engineering.</h1><p>A technical guide to an Android telematics SDK example, its Compose host, and the distribution pipeline. Canonical Markdown, native screenshots, source and executable checks are in GitHub.</p><span class="pill">Independent SDK exploration</span><p class="small">CMT integration is a labeled mock. Replay is synthetic, power comparisons are modeled, and no emergency response or real upload occurs. Mermaid diagrams below are preserved as source; GitHub renders their canonical Markdown versions.</p></header><div class="gallery"><figure><img src="screenshots/01-welcome.png" alt="Welcome · local lab"><figcaption>Welcome · local lab</figcaption></figure><figure><img src="screenshots/05-trip-detail.png" alt="Persisted synthetic trip"><figcaption>Persisted synthetic trip</figcaption></figure><figure><img src="screenshots/07-power-model.png" alt="Power ownership model"><figcaption>Power ownership model</figcaption></figure><figure><img src="screenshots/10-local-acknowledgment.png" alt="Local mock acknowledgment"><figcaption>Local mock acknowledgment</figcaption></figure><figure><img src="screenshots/12-cmt-mock-boundary.png" alt="CMT mock boundary"><figcaption>CMT mock boundary</figcaption></figure><figure><img src="screenshots/16-device-session-active.png" alt="Actual location FGS"><figcaption>Actual location FGS</figcaption></figure></div><section id="start-here"><h1>Getting started with RoadSignal Lab</h1>
+<p>RoadSignal Lab explores the contracts between an Android SDK and its host application: capture, consent, durable work, state observation and artifact distribution.</p>
+<h2>Build and run</h2>
+<p>Open the project in Android Studio with JDK 21 for Gradle. Install Android SDK platform 36 and run <code>sample-app</code> on Android 8+ (API 26+).</p>
+<pre><code class="language-sh">./gradlew :sample-app:assembleDebug
+</code></pre>
+<p>Choose <strong>Explore the lab → Controls → Enable local SDK → Overview → Replay commute</strong>. Replay needs no account, API key, network endpoint or location permission. Open Trips to inspect the persisted route, events and driver/passenger correction. Device capture is a separate explicit action with runtime permission handling.</p>
+<h2>Explore the implementation</h2>
+<table>
+<thead>
+<tr>
+  <th>Area</th>
+  <th>Entry points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Trip state machine</td>
+  <td><code>TripEngine.accept</code> and core reducer tests</td>
+</tr>
+<tr>
+  <td>SDK ownership</td>
+  <td><code>RoadSignal.get</code>, <code>startReplay</code>, <code>startLiveFromVisibleActivity</code></td>
+</tr>
+<tr>
+  <td>Android capture</td>
+  <td><code>CaptureService</code> and <code>DeviceCapture</code></td>
+</tr>
+<tr>
+  <td>Durability and privacy</td>
+  <td><code>TripStore.save</code>, <code>revokeAndDelete</code>, <code>sync</code></td>
+</tr>
+<tr>
+  <td>Deferred work</td>
+  <td><code>UploadWorker.doWork</code></td>
+</tr>
+<tr>
+  <td>Host integration</td>
+  <td><code>LabViewModel</code>, lifecycle-aware state collection, <code>JavaRoadSignalClient</code></td>
+</tr>
+<tr>
+  <td>Artifact integration</td>
+  <td><code>distribution-consumer</code>, publication and verification scripts</td>
+</tr>
+</tbody>
+</table>
+<p>Follow a sample's timestamp, thread, collection generation, consent epoch and storage boundary. Finalized trips are durable; an active partial trip is not checkpointed. The Partners screen uses an original mock adapter and explicitly reports unavailable real-vendor setup.</p>
+<h2>Reproduce the journeys</h2>
+<p><a href="#user-journeys">USER_JOURNEYS.md</a> describes all 16 flows. <a href="https://github.com/phillipsk/RoadSignalLab/blob/main/docs/SCREENSHOT_GALLERY.md">SCREENSHOT_GALLERY.md</a> shows native captures. Lab contains Power, Outbox, Pipeline and Diagnostics views. Controls exposes consent, device start/stop and local deletion.</p>
+<h2>Verify and distribute</h2>
+<pre><code class="language-sh">scripts/verify.sh
+scripts/distribute.sh
+# Disposable emulator only; this resets the lab fixture data:
+scripts/instrumented.sh
+</code></pre>
+<p>See <a href="#architecture">architecture</a>, <a href="#sdk-api">SDK API contracts</a>, <a href="#distribution">distribution</a>, and <a href="#verification">verification</a>. The <a href="#research">research ledger</a> links primary sources. <a href="#implementation-status">Implementation status</a> distinguishes implemented behavior, mocks and production gaps.</p>
+</section><section id="implementation-status"><h1>What this project actually does</h1>
+<p>This is an original educational SDK, not a port, implementation, licensed distribution or performance equivalent of CMT DriveWell/MobileAPI. The public API is version 0.1.1 and remains a prototype. Review the implementation and verification evidence for the supported behavior and remaining work.</p>
+<table>
+<thead>
+<tr>
+  <th>Capability</th>
+  <th>Status</th>
+  <th>Practical boundary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Kotlin/Compose host with multiple journeys</td>
+  <td>Implemented</td>
+  <td>Synthetic data is the default</td>
+</tr>
+<tr>
+  <td>Independent pure JVM SDK engine</td>
+  <td>Implemented</td>
+  <td>Rule-based thresholds, not ML</td>
+</tr>
+<tr>
+  <td>Automatic trip start/stop inside an armed stream</td>
+  <td>Implemented</td>
+  <td>Three valid moving fixes and stationary dwell; no always-on discovery</td>
+</tr>
+<tr>
+  <td>GPS/location + linear acceleration + gyroscope</td>
+  <td>Implemented</td>
+  <td>User-started location foreground service; registration and batching requests, not guaranteed sensor delivery</td>
+</tr>
+<tr>
+  <td>Live permission/foreground-service handling</td>
+  <td>Implemented</td>
+  <td>Start from visible host UI; approximate/poor data may not meet quality gates</td>
+</tr>
+<tr>
+  <td>Sensor gap, bad fix, ordering and finite-value gates</td>
+  <td>Implemented</td>
+  <td>Conservative segmentation; distance during missing data is omitted</td>
+</tr>
+<tr>
+  <td>Braking/acceleration events, impact candidate</td>
+  <td>Implemented heuristics</td>
+  <td>No validated safety, insurance-risk or emergency inference</td>
+</tr>
+<tr>
+  <td>Driver/passenger classification</td>
+  <td>User correction</td>
+  <td>No automatic classifier; label is local</td>
+</tr>
+<tr>
+  <td>Phone handling</td>
+  <td>Explicit replay fixture only</td>
+  <td>No real distraction inference or phone-content access</td>
+</tr>
+<tr>
+  <td>Encrypted durable trip payloads</td>
+  <td>Implemented</td>
+  <td>AES-GCM/Android Keystore; metadata plaintext; finalized trips only</td>
+</tr>
+<tr>
+  <td>Local outbox, retries, permanent failure, receipts</td>
+  <td>Implemented</td>
+  <td>Mock server responses; no HTTP upload</td>
+</tr>
+<tr>
+  <td>WorkManager scheduling</td>
+  <td>Implemented</td>
+  <td>Connected-network constraint + exponential backoff; system scheduling is not immediate</td>
+</tr>
+<tr>
+  <td>Local capture policy with revision and TTL</td>
+  <td>Implemented</td>
+  <td>Local fixture; no deployed remote transport, signature or targeting service</td>
+</tr>
+<tr>
+  <td>No explicit SDK-owned partial wake lock</td>
+  <td>Implemented</td>
+  <td>Not a measured battery improvement; dependencies/platform may acquire their own locks</td>
+</tr>
+<tr>
+  <td>CMT integration</td>
+  <td>Mock + unavailable vendor adapter</td>
+  <td>No sanctioned artifact/API guide was verified; partner setup required</td>
+</tr>
+<tr>
+  <td>Core ABI + Android/bridge public descriptor checks</td>
+  <td>Implemented</td>
+  <td>Baselines are review gates; behavior compatibility still needs tests</td>
+</tr>
+<tr>
+  <td>Project-local Maven publishing + external consumer</td>
+  <td>Implemented</td>
+  <td>POM/AAR/JAR/module metadata and source artifacts, no commercial registry</td>
+</tr>
+<tr>
+  <td>Pinned GitHub Actions CI and tag attestation job</td>
+  <td>Configured</td>
+  <td>API 31/35/36, release upload and two-subject provenance; current-source results are tracked in verification evidence; no SLSA level claim</td>
+</tr>
+<tr>
+  <td>Long-lived recording/process-death continuation</td>
+  <td>Not implemented</td>
+  <td>Partial active trip can be lost; no silent restart</td>
+</tr>
+<tr>
+  <td>Always-on low-power discovery, activity recognition, BLE Tag</td>
+  <td>Design only</td>
+  <td>Permission, policy, hardware and field-validation work remains</td>
+</tr>
+<tr>
+  <td>Authentication, cloud scoring, crash response, remote config service</td>
+  <td>Not implemented</td>
+  <td>No tokens, backend account or external telemetry</td>
+</tr>
+</tbody>
+</table>
+<h2>Deliberate prototype limits</h2>
+<p>The SDK uses one process, one application-scoped instance and one collection at a time. Starting a new replay/device session stops the old one. It retains at most 50 trip summaries, 500 route points and 200 events per trip, plus a 64-element device sample queue. Route points after the cap are omitted rather than sampled; production would need a reviewed decimation policy. Gyroscope peaks are diagnostics, not a driver-behavior classifier. Sensor peaks and location speed are not synchronized sensor fusion.</p>
+<p>The outbox stores unique finalized-trip IDs. Acknowledgments are local receipt rows, not a server-side exactly-once protocol. Role corrections are persisted locally and do not enqueue a new revision after acknowledgment. Retries have a finite attempt budget; dead-letter recovery is explicit. Real backend implementation requires payload revisions, authentication, authorization, idempotency at the server, timeout/rate-limit handling, consent-aware cancellation and contract tests.</p>
+<p>There is no 99% battery claim. The workbench compares a hypothetical 180-second explicit lock with an explicit-lock-free design. It cannot infer battery consumption, wakelock-vitals session rate, capture completeness, or CMT's production results.</p>
+</section><section id="architecture"><h1>Architecture and execution model</h1>
+<h2>Boundaries</h2>
+<pre><code class="language-mermaid">flowchart TB
+    App[Compose host / ViewModel] --&gt; SDK[RoadSignal facade]
+    App --&gt; Bridge[CMT mock integration port]
+    Bridge --&gt; SDK
+    SDK --&gt; Core[Pure JVM TripEngine]
+    SDK --&gt; Store[SQLite transaction + encrypted payloads]
+    SDK --&gt; Service[User-started location FGS]
+    Service --&gt; Sensors[Location + linear acceleration + gyro]
+    Sensors --&gt; Queue[Bounded generation-tagged channel]
+    Queue --&gt; SDK
+    Store --&gt; Worker[WorkManager / local mock transport]
+    SDK --&gt; Flow[StateFlow snapshot]
+    Flow --&gt; App
+</code></pre>
+<p><code>telematics-core</code> has no Android, coroutine, location-service or network dependencies. It accepts copied immutable samples and produces deterministic state transitions and finalized summaries. <code>telematics-sdk</code> owns execution and resources. The host owns presentation, permission prompts and visible user choices. <code>cmt-bridge</code> is a replaceable partner boundary. Distribution consumers receive core transitively via the AAR's published API dependency.</p>
+<h2>State and timing</h2>
+<pre><code class="language-mermaid">stateDiagram-v2
+    [*] --&gt; STOPPED
+    STOPPED --&gt; ARMED: explicit start after consent
+    ARMED --&gt; CANDIDATE: valid moving fix
+    CANDIDATE --&gt; ARMED: evidence falls below threshold
+    CANDIDATE --&gt; RECORDING: three consecutive moving fixes
+    RECORDING --&gt; SETTLING: speed below stop threshold
+    SETTLING --&gt; RECORDING: movement resumes
+    SETTLING --&gt; ARMED: stationary dwell finalizes trip
+    RECORDING --&gt; ARMED: long gap finalizes prior segment
+    ARMED --&gt; STOPPED: stop / revoke / policy disable
+    RECORDING --&gt; STOPPED: stop / revoke / policy disable
+</code></pre>
+<p>Samples use elapsed milliseconds derived from <code>Location.elapsedRealtimeNanos</code> or synthetic replay time; sensor callbacks use the corresponding elapsed clock. Wall-clock changes cannot alter trip duration or acceleration calculations. Trip confirmation deliberately starts at the confirmation fix, not the first candidate, so pre-confirmation distance is omitted. A long gap closes the previous trip at the last accepted fix. No distance is invented across the gap. Stationary dwell tolerates traffic lights; it is not a production-trained transport classifier.</p>
+<p>Policies are validated against revision and absolute TTL at application. The Android facade converts remaining policy TTL to an elapsed-time deadline and schedules one expiry action for an active collection; later wall-clock adjustments cannot extend an active policy. Configuration is not persisted, remotely authenticated or targeted. A production control plane needs signed payloads, capability/version gating, a last-known-good strategy, persisted expiry semantics and audited targeting.</p>
+<h2>Concurrency and ownership</h2>
+<p>The application-scoped facade retains only application context. Public suspending mutations move disk/crypto work onto <code>Dispatchers.IO</code>, then acquire a single-writer <code>Mutex</code>. The engine is never accessed concurrently. The scope uses a supervisor and bounded error reporting. <code>StateFlow</code> gives consumers the latest state; it is not an event-delivery guarantee or durable event bus.</p>
+<p>Hardware callbacks run on one owned <code>HandlerThread</code>. They copy values, aggregate bounded linear/gyro peaks and offer location-timestamped samples into a 64-element channel. Overflow increments a counter instead of allocating unbounded work. A collection-generation tag fences callbacks left over from a stopped/replaced capture. Consent has a separate durable epoch: an asynchronous producer cannot save a trip after revocation under the old epoch. Those are different lifetimes and require different guards.</p>
+<p>The service is non-exported, started by visible host UI, uses the location FGS type and posts a Stop notification. It is not sticky, stops with the task, and does not start at boot. Listener registrations and the handler thread are released on stop/destruction. A process death does not auto-resume capture. Availability is a product contract, not a reason to silently bypass platform rules.</p>
+<h2>Persistence and recovery</h2>
+<p>Finalizing a trip inserts its encrypted summary and outbox ID in one SQLite transaction. Schema v2 adds a capture-wall-time column; an instrumented v1 fixture verifies a non-destructive migration. Payload schema v1 is independent of database schema and SDK SemVer. Unsupported migrations fail; the SDK does not delete and recreate user data.</p>
+<p>AES-GCM encrypts payload columns with an Android Keystore key. Primary IDs, sequence numbers, timestamps, consent state, retry state and counts remain SQLite metadata. It is not whole-database encryption. The store surfaces unreadable ciphertext records rather than rendering plaintext or claiming successful recovery.</p>
+<p>Only finalized trips are durable. The current engine does not checkpoint an active partial trip. The cold-process test checks that finalized journal/outbox state reloads and capture remains stopped. Production crash recovery would need encrypted segment checkpoints, restart reconciliation and a reviewed policy for incomplete trips.</p>
+<h2>Extension seams</h2>
+<ul>
+<li>Replace the mock transport behind an explicit authenticated upload contract, with payload revisions and server idempotency.</li>
+<li>Implement a licensed CMT adapter only after receiving exact supported vendor APIs and redistribution terms.</li>
+<li>Introduce low-power discovery as a separate platform component, with Activity Recognition or other justified triggers and explicit permission/policy handling.</li>
+<li>Upgrade peak features to calibrated, timestamp-aligned sensor windows; account for phone orientation, mounts, missing gyros and sample-rate variation.</li>
+<li>Add backend model/version provenance and confidence intervals before making any behavioral risk claim.</li>
+<li>Support multi-process hosts through a central broker or interprocess-safe ownership model; process-local mutexes are insufficient.</li>
+</ul>
+</section><section id="sdk-api"><h1>SDK API and host integration</h1>
+<p>All APIs below are RoadSignal's original API. They are not CMT method names.</p>
+<h2>Kotlin quick start</h2>
+<pre><code class="language-kotlin">val sdk = RoadSignal.get(applicationContext)
+
+// In a host Activity. Flow collection is independent of command callbacks.
+lifecycleScope.launch {
+    sdk.awaitReady()
+    repeatOnLifecycle(Lifecycle.State.STARTED) {
+        sdk.state.collect { snapshot -&gt; /* render */ }
+    }
+}
+
+// Wire each callback to its own disclosed, explicit user action.
+// Launch suspend callbacks from the host's lifecycle-owned scope.
+suspend fun onConsentAccepted() = sdk.grantConsent()  // does not start sensors
+suspend fun onReplayRequested() = sdk.startReplay(ReplayScenario.COMMUTE)
+suspend fun onStopRequested() = sdk.stop()            // releases producers
+suspend fun onDeleteConfirmed() = sdk.revokeConsentAndDelete()
+</code></pre>
+<p>The Compose host uses <code>collectAsStateWithLifecycle</code>. Production hosts should collect with their lifecycle as well; an Activity collector should not control the lifetime of a running SDK capture.</p>
+<table>
+<thead>
+<tr>
+  <th>API</th>
+  <th>Contract</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>RoadSignal.get(Context)</code></td>
+  <td>Application-scoped singleton; no sensing on construction</td>
+</tr>
+<tr>
+  <td><code>awaitReady()</code> / <code>refresh()</code></td>
+  <td>Load encrypted local state; IO dispatched off main</td>
+</tr>
+<tr>
+  <td><code>state: StateFlow&lt;SdkSnapshot&gt;</code></td>
+  <td>Current consent, recording state, provenance, journal, counters and diagnostics</td>
+</tr>
+<tr>
+  <td><code>grantConsent()</code></td>
+  <td>Persists consent, does not request permissions or start capture</td>
+</tr>
+<tr>
+  <td><code>startReplay(scenario, frameDelayMillis)</code></td>
+  <td>Stops previous session, arms synthetic stream, returns start acceptance</td>
+</tr>
+<tr>
+  <td><code>startLiveFromVisibleActivity(Activity)</code></td>
+  <td>Requires consent, current policy, focused/visible Activity and location permission; Android remains final authority</td>
+</tr>
+<tr>
+  <td><code>stop()</code></td>
+  <td>Stops current producer/service; finalizes valid active trip if consent remains</td>
+</tr>
+<tr>
+  <td><code>applyPolicy(CapturePolicy)</code></td>
+  <td>Rejects stale/expired/oversized TTL; applies local enable/profile settings</td>
+</tr>
+<tr>
+  <td><code>sensorCapabilities()</code></td>
+  <td>Local sensor presence, wake-up flag and advertised FIFO capacity; does not prove actual batching</td>
+</tr>
+<tr>
+  <td><code>classifyTrip(id, role)</code></td>
+  <td>Persists a user-confirmed local role; no automatic driver inference</td>
+</tr>
+<tr>
+  <td><code>setUploadSimulation(mode)</code></td>
+  <td>Selects entirely local ACK/offline/retry-once/permanent-reject behavior</td>
+</tr>
+<tr>
+  <td><code>enqueueUpload()</code></td>
+  <td>Schedules unique constrained WorkManager work; not immediate completion</td>
+</tr>
+<tr>
+  <td><code>retryDeadLetters()</code></td>
+  <td>Explicitly returns failed entries to a fresh attempt budget</td>
+</tr>
+<tr>
+  <td><code>revokeConsentAndDelete()</code></td>
+  <td>Stops recording, cancels work, invalidates epochs/generations and deletes local data</td>
+</tr>
+</tbody>
+</table>
+<h2>Java interoperability</h2>
+<p><code>RoadSignal.get(Context)</code> is <code>@JvmStatic</code>. <code>JavaRoadSignalClient</code> offers callbacks for consent, replay and deletion without exposing <code>Continuation</code> to a Java host. Callbacks run on main. Close the adapter when its host owner ends; closing the adapter cancels that adapter's pending operations and observers, not the SDK's application-scoped recording. Stop collection explicitly.</p>
+<pre><code class="language-java">JavaRoadSignalClient client = new JavaRoadSignalClient(context);
+client.grantConsent(result -&gt; {
+    if (result.getAccepted()) {
+        client.replay(ReplayScenario.COMMUTE, started -&gt; {
+            // Accepted means the replay started. Observe state for completion.
+        });
+    }
+});
+// Later: client.close();
+</code></pre>
+<h2>Permission and execution boundary</h2>
+<p>The host declares <code>ACCESS_COARSE_LOCATION</code> and <code>ACCESS_FINE_LOCATION</code> in its own manifest, then explains location use before prompting. The SDK does not force those host declarations. Request coarse/fine together, accept the user's approximate choice, and handle denial without loops. Notification permission is a distinct UX choice. A notification permission grant is not the same as permission to start an FGS, and a missing notification grant does not remove the FGS's own platform obligations.</p>
+<p>The sample requests no background-location permission and performs no automatic background start. User-started live recording can continue after the Activity is hidden under the platform's location FGS rules. A foreground service does not guarantee that the CPU remains awake, that every fix is delivered or that the process survives.</p>
+<h2>Results, exceptions and cancellation</h2>
+<p><code>SdkResult.accepted</code> reports a command's admission, not the success of an entire trip, upload or safety outcome. Guard failures use a result/message. Unexpected persistence/Keystore errors can still surface from suspending calls; hosts must handle them, as <code>LabViewModel</code> does. The Java adapter converts unexpected operational exceptions to a failed callback. Coroutine cancellation is propagated; it is not reclassified as a retry or a successful command.</p>
+<p><code>startReplay</code> starts work in the application scope. Canceling the caller's UI coroutine after command acceptance does not cancel collection; call <code>stop</code> or revoke consent. Snapshots conflate updates; durable summaries/outbox are the source of truth for finalized work. Diagnostics are bounded operational messages, not an audit log or production analytics pipeline.</p>
+<h2>Compatibility review</h2>
+<p>Keep source, binary, behavior, storage and configuration compatibility separate. Adding a default parameter to a public Kotlin constructor can still change JVM descriptors. Adding an enum case can break exhaustive host logic. Changing <code>StateFlow</code> emission semantics or policy defaults can break apps without changing signatures. Persisted WorkManager class names are a deployment contract. Core ABI and Android descriptor baselines are necessary gates, not proof of complete compatibility.</p>
+</section><section id="power-and-reliability"><h1>Power, capture quality and reliability</h1>
+<h2>The three questions that must stay separate</h2>
+<ol>
+<li><strong>Is the process eligible to run?</strong> Foreground service priority and execution rules affect this.</li>
+<li><strong>Is the CPU awake right now?</strong> Explicit or platform-owned wake locks and sensor wake-up behavior affect this.</li>
+<li><strong>Is the product receiving useful data?</strong> Accuracy, gaps, batching, missing hardware and classification affect this.</li>
+</ol>
+<p>A visible service is not an immortal process or a continuous CPU guarantee. Removing an owned wake lock is not proof of a measured energy improvement. A lower platform metric with missing trips is not success.</p>
+<p><a href="https://developer.android.com/google/play/vitals/excessive-wakelock">Android vitals</a> currently defines excessive use using aggregated non-exempt partial wake-lock duration and affected sessions, with a 28-day bad-behavior threshold. Its current wording differs from a casual description of screen-off time; use the platform definition and date-stamp any dashboard analysis. Framework exemptions and attribution need to be understood before interpreting an SDK-owned tag. The lab does not generate an Android vitals report.</p>
+<h2>What runs here</h2>
+<ul>
+<li>No explicit partial-wake-lock acquisition or custom wake-lock permission is written by this SDK. WorkManager and system APIs may independently use locks.</li>
+<li>No polling thread runs while idle. Active capture registers sensors once, uses one handler and sends copied location samples through a bounded channel.</li>
+<li>Requested linear-acceleration and gyro rates are 10/20/50 Hz. Requested batching is 10/5/0 seconds for economy/balanced/responsive. Actual rate and latency depend on sensor hardware/OS.</li>
+<li>Location request intervals are 10/5/2 seconds. These are requests, not hard real-time deadlines or guarantees of fix quality.</li>
+<li>The host workbench's 180 seconds versus zero seconds is a counterfactual ownership model. It is neither a before/after device experiment nor a savings claim.</li>
+</ul>
+<p><a href="https://source.android.com/docs/core/interaction/sensors/batching">AOSP batching</a> depends on a real FIFO/sensor hub and distinguishes wake-up from non-wake-up delivery. A non-wake-up stream can lose data when the CPU sleeps and buffers fill. A requested maximum report latency does not create hardware buffering that the device lacks. <code>sensorCapabilities()</code> exposes advertised capacity so the lab can discuss this constraint honestly.</p>
+<h2>Measurement plan for a production SDK</h2>
+<p>Use a preregistered device/OS/host-target matrix and paired repeatable drives. Capture baseline and treatment with matched route, screen state, network, charge state, thermal conditions, sensor configuration and model version. Include app-only and permission-limited cases. Emulator correctness tests cannot measure real power consumption or hardware FIFO reliability.</p>
+<table>
+<thead>
+<tr>
+  <th>Dimension</th>
+  <th>Proposed measurement</th>
+  <th>Guardrail</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Capture</td>
+  <td>Matched trip count/duration, start delay, distance error, sensor-window coverage</td>
+  <td>No meaningful decline relative to labeled ground truth</td>
+</tr>
+<tr>
+  <td>Gaps</td>
+  <td>Inter-fix distribution, longest gap, dropped/FIFO-overflow rate</td>
+  <td>Stratify screen-off, device, OS and thermal state</td>
+</tr>
+<tr>
+  <td>Power</td>
+  <td>Energy/battery drain over controlled windows, CPU residency, wake-lock ownership/duration, wakeups</td>
+  <td>Report units and uncertainty; normalize duration and environment</td>
+</tr>
+<tr>
+  <td>Stability</td>
+  <td>Crash/ANR rate, memory, callback backlog, initialization latency</td>
+  <td>Observe the host app, not just SDK process code</td>
+</tr>
+<tr>
+  <td>Network</td>
+  <td>Bytes, batch count, retry amplification and radio wakeups</td>
+  <td>Cost per active recording hour and completed trip</td>
+</tr>
+<tr>
+  <td>Adoption</td>
+  <td>SDK/app version, compatible config, activation time, observed behavior</td>
+  <td>Publish, activate and verify are distinct milestones</td>
+</tr>
+</tbody>
+</table>
+<p>Use Perfetto/system traces, device power tooling, Android vitals supplied by host owners, redacted custom counters and field comparisons. Do not collect raw routes merely to monitor runtime health. Choose a real power instrument and validation methodology before promising a percentage.</p>
+<h2>Failure and bottleneck matrix</h2>
+<table>
+<thead>
+<tr>
+  <th>Failure mode</th>
+  <th>Current behavior</th>
+  <th>Production design work</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>No location permission / Android blocks start</td>
+  <td>Explicit failure; replay still usable</td>
+  <td>Partner UX, denial funnel, platform/version validation</td>
+</tr>
+<tr>
+  <td>Approximate/poor/missing speed fix</td>
+  <td>Quality gate or wait; no invented zero speed</td>
+  <td>Confidence-aware fallback and documented degraded mode</td>
+</tr>
+<tr>
+  <td>Long gap / duplicate timestamp</td>
+  <td>Segment or reject deterministically</td>
+  <td>Sensor-window recovery and gap-attributed metrics</td>
+</tr>
+<tr>
+  <td>Missing linear/gyro sensor</td>
+  <td>Location path can continue</td>
+  <td>Capability-specific feature models and monitoring</td>
+</tr>
+<tr>
+  <td>CPU asleep / FIFO unsupported</td>
+  <td>No explicit ownership lock</td>
+  <td>Hardware validation; scoped fallback only if justified by evidence</td>
+</tr>
+<tr>
+  <td>Queue overload</td>
+  <td>Drop counter; fixed bound</td>
+  <td>Backpressure budget and quality impact attribution</td>
+</tr>
+<tr>
+  <td>Database/Keystore error</td>
+  <td>No plaintext fallback; expose failure/unreadable state</td>
+  <td>Key lifecycle, recovery UX and carefully scoped operational signals</td>
+</tr>
+<tr>
+  <td>Process killed during drive</td>
+  <td>Active partial trip is lost; no auto restart</td>
+  <td>Checkpoints and OS-compliant restart contracts</td>
+</tr>
+<tr>
+  <td>Host force-stop / user revokes access</td>
+  <td>Collection cannot assume automatic recovery</td>
+  <td>Respect user intent and explain limits</td>
+</tr>
+<tr>
+  <td>Offline / server failure</td>
+  <td>Local mock outbox with finite retries</td>
+  <td>Auth, HTTP classifications, jitter, Retry-After and replay protection</td>
+</tr>
+<tr>
+  <td>Partner remains on old SDK</td>
+  <td>No code-side fix can update their installed binary</td>
+  <td>Adoption ownership, support windows and version-specific controls</td>
+</tr>
+</tbody>
+</table>
+<h2>Rollout experiment design</h2>
+<p>Assign consistently at a driver/app-install level, stratify by SDK/host/OS/hardware, and analyze repeated trips with the correct clustering. Monitor recording completeness and errors alongside runtime cost. Avoid unrelated model changes in the same experiment where possible; otherwise track them as confounders. Define stopping rules and confidence requirements before rollout. A remote rollback can change only code paths already shipped; it cannot repair a binary that does not understand the setting. This is a proposed design, not a deployed experiment.</p>
+</section><section id="data-and-privacy"><h1>Data ownership, privacy and threat model</h1>
+<h2>Actual data flow</h2>
+<p>Replay creates fictional coordinates, speed and event fixtures. Device mode reads location/provider speed and scalar motion features only during an explicitly started session. Completed trip payloads are encrypted locally. The mock transport stores local acknowledgments and never sends a network request. The sample has no account, advertising ID, contact access, phone-content inspection or CMT token.</p>
+<table>
+<thead>
+<tr>
+  <th>Data</th>
+  <th>Storage</th>
+  <th>Lifetime / exposure</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Raw high-frequency sensor callbacks</td>
+  <td>Bounded in-memory peaks only</td>
+  <td>Reset on location processing; not raw-sensor history</td>
+</tr>
+<tr>
+  <td>Current trip samples/state</td>
+  <td>Memory</td>
+  <td>Lost if the process dies before finalization</td>
+</tr>
+<tr>
+  <td>Finalized route/events/role/distance</td>
+  <td>AES-GCM payload in app-private SQLite</td>
+  <td>Up to 50 retained trip rows; route/event caps apply</td>
+</tr>
+<tr>
+  <td>UUID trip IDs, sequence, wall time, queue attempts, consent epoch</td>
+  <td>Plain SQLite metadata</td>
+  <td>Not whole-database encryption</td>
+</tr>
+<tr>
+  <td>Local mock receipts</td>
+  <td>SQLite IDs</td>
+  <td>At most 100 retained receipts</td>
+</tr>
+<tr>
+  <td>Diagnostics</td>
+  <td>Memory, 30 fixed messages</td>
+  <td>No raw coordinates/tokens; not remotely collected</td>
+</tr>
+<tr>
+  <td>Location permission</td>
+  <td>Android OS</td>
+  <td>Host/user controlled; separate from SDK consent</td>
+</tr>
+</tbody>
+</table>
+<h2>Consent is an execution invariant</h2>
+<p>Granting consent only changes the local consent record. It does not start collection. Replay and device capture require a separate action. Revocation stops producers, advances the collection generation, updates durable consent/epoch and deletes trip/outbox/receipt rows transactionally. Pending saves using the old epoch fail. Scheduled work is canceled and rechecks consent before local processing. Tests exercise revocation amid concurrent replay commands.</p>
+<p>For a future real transport, revocation must abort work where possible and fence subsequent acknowledgments. Data already transmitted cannot be made unsent; the backend needs deletion/retention contracts and reconciliation. The lab does not pretend that deleting local rows erases a remote system.</p>
+<h2>Encryption scope and recovery</h2>
+<p>Android Keystore creates the AES key, with authenticated encryption and unique provider-generated IVs. Hardware/StrongBox backing is not asserted. Plaintext is necessarily present briefly in process memory during encoding/rendering. Database metadata and the app's own in-memory UI are not encrypted by this payload scheme. Rooted/compromised-device access and a malicious host process are outside the protection it provides.</p>
+<p>The sample disables app backup and supplies explicit legacy and Android 12+ cloud/device-transfer exclusions. A real integrating host must exclude SDK ciphertext and related state from unsupported restores or design a reviewed restore/key strategy. Ciphertext without its Keystore key is not recoverable merely by reinstalling. Key errors never trigger plaintext writes. Logical row deletion is not a claim of physical flash sanitization or cryptographic erasure; the current implementation does not destroy and rotate the Keystore key on every delete.</p>
+<h2>Threats and mitigations</h2>
+<table>
+<thead>
+<tr>
+  <th>Threat</th>
+  <th>Current mitigation</th>
+  <th>Remaining work</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Accidental sensing before opt-in</td>
+  <td>Explicit setup, consent/start guards</td>
+  <td>Review host disclosure and consent provenance</td>
+</tr>
+<tr>
+  <td>Callback/save races after deletion</td>
+  <td>Collection generation + durable epoch + transaction</td>
+  <td>Multi-process coordination is unsupported</td>
+</tr>
+<tr>
+  <td>Local payload disclosure</td>
+  <td>App sandbox + Keystore-backed AES-GCM</td>
+  <td>Metadata exposure, memory, compromised host/device</td>
+</tr>
+<tr>
+  <td>Forged/expired configuration</td>
+  <td>Local revision/TTL validation</td>
+  <td>Authenticated transport, signatures, anti-rollback persistence</td>
+</tr>
+<tr>
+  <td>Duplicate sends / backend abuse</td>
+  <td>Local unique trip IDs and receipt mock</td>
+  <td>Authenticated server idempotency, user/tenant authorization, quotas</td>
+</tr>
+<tr>
+  <td>SDK logs leak route/token</td>
+  <td>Bounded fixed messages</td>
+  <td>Audit future logging, crash attachments and support bundles</td>
+</tr>
+<tr>
+  <td>Malicious dependency/update</td>
+  <td>Pinned versions/actions, wrapper checksum, CI checks</td>
+  <td>Reviewed dependency verification/SBOM and independent artifact provenance</td>
+</tr>
+<tr>
+  <td>Host integration conflicts</td>
+  <td>Minimal manifest surface and published consumer</td>
+  <td>More partner, Android, target-SDK and permission combinations</td>
+</tr>
+</tbody>
+</table>
+<p>The <a href="https://developer.android.com/guide/practices/sdk-best-practices">Android SDK safety guidance</a> makes host-app disclosure/policy effects an SDK concern. This is an engineering lab, not a compliance attestation. Before production collection, define the product purpose, necessary fields, retention/deletion, consent UX, host disclosures, authorized recipients and ownership with the appropriate product/privacy teams.</p>
+<h2>Merged manifest, not just our source manifest</h2>
+<p>WorkManager transitively adds <code>WAKE_LOCK</code>, <code>ACCESS_NETWORK_STATE</code>, <code>RECEIVE_BOOT_COMPLETED</code>, its initializer, job services and rescheduling receivers. These do not start RoadSignal capture at boot. Its scheduled mock delivery can be rescheduled by the dependency. The host adds coarse/fine location and notification permissions; the SDK adds foreground-service/type permissions. There is no background-location or internet permission in this sample. Debug tooling/test activities are separate from the release surface.</p>
+<p>Review the final merged manifest and dependency closure for every release. An SDK's source manifest and AAR size alone do not describe the resulting host's permissions, startup cost or package size. <code>scripts/check_manifest.py</code> verifies this project's intended release boundary.</p>
+</section><section id="distribution"><h1>Distribution and compatibility</h1>
+<h2>Executable local publication</h2>
+<pre><code class="language-sh">scripts/verify.sh
+scripts/distribute.sh
+</code></pre>
+<p>The first script checks behavior, core ABI, Android/bridge public JVM signatures, shrinker builds, lint and local document links. The second publishes to <code>build/maven-repository</code>, then builds an independent app with <code>-PconsumePublishedSdk=true</code>. <code>verifyPublishedDependencies</code> asserts all three RoadSignal dependencies are external <code>ModuleComponentIdentifier</code> components at the requested version. A project dependency is a test failure in this mode.</p>
+<p>Coordinates:</p>
+<pre><code class="language-text">io.github.phillipsk.roadsignal:telematics-core:0.1.1   JVM JAR
+io.github.phillipsk.roadsignal:telematics-sdk:0.1.1    Android AAR
+io.github.phillipsk.roadsignal:cmt-bridge:0.1.1        Android AAR; mock partner adapter
+</code></pre>
+<p>The core is exposed with <code>api</code> because its models are part of the Android facade. Coroutines <code>StateFlow</code> is also a public dependency. WorkManager and Android implementation details remain implementation dependencies. Publication includes POM/Gradle module metadata and source archives. The core's Javadoc task has no Java source API; Kotlin KDoc is supplied in sources and this guide. No claim of generated HTML API documentation is made.</p>
+<p>The distribution script builds a deterministic ZIP entry order/timestamp, file checksums and an unsigned local build manifest. That does not prove that all compiler outputs are bit-for-bit reproducible across machines. The local manifest labels its provenance limitations. Full artifact reproducibility requires clean matched-toolchain rebuild comparisons and control of every nondeterministic input.</p>
+<h2>Client consumption</h2>
+<p>Unpack the Maven ZIP into a directory; add its URI as a Maven repository in the consumer's <code>settings.gradle.kts</code>. Pin an explicit version and declare <code>implementation(&quot;io.github.phillipsk.roadsignal:telematics-sdk:0.1.1&quot;)</code>. Keep the POM and module metadata; copying only an AAR loses transitive dependency information. Sources are for debugging and review, not a substitute for published metadata.</p>
+<p>The lab keeps distribution contained in the project: GitHub Actions artifacts carry the Maven ZIP and debug demo APK. The tag-only release job attaches its exact attested ZIP/APK, checksums and unsigned file manifest to the matching existing GitHub release after verification. It fails rather than replacing an existing asset. It does not publish into Maven Central or GitHub Packages, need registry secrets, or redistribute CMT software. A real team would choose a supported commercial registry/channel, availability policy, credential model and retention contract.</p>
+<h2>Version and branch policy</h2>
+<p>The only artifact version source is <code>sdkVersion</code> in <code>gradle.properties</code>. The SDK's generated version constant follows it. The demonstration release uses version <code>0.1.1</code>. SemVer permits unstable 0.x APIs; this project voluntarily preserves 0.1.x source/binary contracts and reserves 0.2 for reviewed prototype API changes. A future stable 1.x line would adopt the documented public compatibility policy explicitly.</p>
+<ul>
+<li><code>main</code>: reviewed integration for the next release; no production-branch promise is implied.</li>
+<li><code>release/0.1</code>: maintenance line for the 0.1 family; changes are cherry-picked with test evidence.</li>
+<li>Short-lived feature/fix branches: review, merge and remove when recoverable through Git history.</li>
+<li>Immutable release tags/artifacts (annotated tags are recommended for a team-managed release): never replace a published version to conceal a mistake. Publish a new version and an advisory/migration note.</li>
+</ul>
+<p>No branch-protection or registry policy is assumed merely because a document says it should exist. This repository's actual branches/tags and remote CI are recorded in verification evidence.</p>
+<h2>Five compatibility surfaces</h2>
+<table>
+<thead>
+<tr>
+  <th>Surface</th>
+  <th>Gate</th>
+  <th>Examples a signature diff misses</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Source</td>
+  <td>Kotlin/Java clients compile</td>
+  <td>Named arguments, overload ambiguity, exhaustive enums</td>
+</tr>
+<tr>
+  <td>Binary</td>
+  <td>Core ABI and Android JVM descriptor baselines; shrunk consumer</td>
+  <td>Generated constructors/copy methods and Kotlin metadata details</td>
+</tr>
+<tr>
+  <td>Behavior</td>
+  <td>Reducer, lifecycle, concurrency and host journeys</td>
+  <td>Callback threading, emission timing, permission/start semantics</td>
+</tr>
+<tr>
+  <td>Data</td>
+  <td>Non-destructive schema fixture and persistence tests</td>
+  <td>Downgrades, key loss, partial-trip recovery, future schema variants</td>
+</tr>
+<tr>
+  <td>Configuration</td>
+  <td>Revision/TTL/enable tests</td>
+  <td>Older binary understanding of new fields or defaults</td>
+</tr>
+</tbody>
+</table>
+<p>Baseline changes require human review. A newly compiled consumer is not a full old-binary compatibility test; release engineering should also run a frozen precompiled client against the new artifacts. Published WorkManager worker class names need migration treatment because queued jobs survive app upgrades.</p>
+<h2>CI and supply chain</h2>
+<p>Actions are pinned to verified commit SHAs. Jobs use read-only repository permissions except the tag-only release job's scoped contents-write and OIDC/attestation permissions. Pull requests do not receive publishing secrets. The build script pins dependencies, the wrapper pins its distribution checksum, and Dependabot proposes reviewed updates.</p>
+<p>The tag job verifies that tag/version match, waits for build/device checks, builds the contained package and requests a GitHub artifact attestation for the SDK ZIP and debug APK before attaching those exact binaries to the release. A local JSON manifest is not equivalent to that signed CI attestation. No SLSA level is claimed. The artifact uploaded by the attestation job is the attested build, and may differ from the separate ordinary build job's ZIP; compare the subject digest, not just filenames.</p>
+<p>Still required before commercial release: dependency verification with reviewed trusted checksums/keys, a complete transitive SBOM, license/security review, signed public release policy, provenance verification instructions and retention/support commitments. Generating checksums from already compromised inputs would not establish trust. Archive timestamp normalization alone does not establish reproducibility.</p>
+<h2>Manifest and footprint review</h2>
+<p>The release verification audits the merged manifest, including WorkManager's transitive wake-lock/boot-rescheduling permissions and components. This prototype's capture service never starts at boot. The host requests no background location and includes no internet permission. Compare the SDK AAR with its dependency closure and the final minified host, not just the small library file. The final artifact sizes are recorded as observations, not universal integration overhead.</p>
+<h2>Verify a downloaded release</h2>
+<p>Download all assets from the same release. Run <code>sha256sum --check SHA256SUMS</code> on Linux or <code>shasum -a 256 -c SHA256SUMS</code> on macOS. Verify the CI provenance separately:</p>
+<pre><code class="language-sh">gh attestation verify roadsignal-maven-0.1.1.zip --repo phillipsk/RoadSignalLab
+gh attestation verify RoadSignalLab-0.1.1-debug.apk --repo phillipsk/RoadSignalLab
+</code></pre>
+<p>A successful attestation verifies provenance and subject digest, not correctness, privacy, security or a SLSA maturity level. Inspect the workflow/source identity and known prototype limits. The debug APK is for demonstration and uses a disposable CI debug signing identity, not a production signing key. A locally built APK may have a different signing identity; uninstall this disposable lab package before switching between local and CI builds if Android rejects the signature. The Maven SDK ZIP has no APK signing identity. See <a href="https://docs.github.com/en/actions/how-tos/secure-your-work/use-artifact-attestations/use-artifact-attestations">GitHub attestation guidance</a> and <a href="https://cli.github.com/manual/gh_release_upload">release upload semantics</a>.</p>
+</section><section id="release-playbook"><h1>Release, activation and partner adoption</h1>
+<p>The <code>v0.1.1</code> prototype includes contained CI publication, an API 31/35/36 matrix and a tag-gated attested ZIP/APK release job. The broader partner operating model below is proposed; no commercial partner rollout has occurred.</p>
+<h2>Example release progression</h2>
+<ol>
+<li>Define product guardrails and supported host/OS/permission matrix before implementation.</li>
+<li>Review the smallest change: sensor execution, public API, schema and config capability separately.</li>
+<li>Run reducer tests, concurrency/privacy tests, device journeys, minified host, published consumer, API diff and migration checks.</li>
+<li>Cut an immutable release candidate; exercise it in internal host apps with real device/drive evidence.</li>
+<li>Publish a numbered artifact and migration guide. Record dependencies, known limits and matching source tag.</li>
+<li>Partner teams integrate, test and release their host apps. Track installed app/SDK adoption, not just repository version changes.</li>
+<li>Activate a compatible configuration cohort after binary adoption reaches the planned threshold.</li>
+<li>Verify runtime and capture-quality metrics before broadening exposure. Keep an audited rollback path and an on-call owner.</li>
+</ol>
+<h2>Capability/version matrix example</h2>
+<table>
+<thead>
+<tr>
+  <th>Host cohort</th>
+  <th>SDK</th>
+  <th>Config contract</th>
+  <th>Next action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Internal preview</td>
+  <td>0.2.0-rc.1</td>
+  <td>v2 feature gated</td>
+  <td>Test API/storage migration before release</td>
+</tr>
+<tr>
+  <td>Supported maintenance</td>
+  <td>0.1.x</td>
+  <td>v1 known fields</td>
+  <td>Backport compatible fixes</td>
+</tr>
+<tr>
+  <td>Older installed app</td>
+  <td>Older binary</td>
+  <td>Unknown future fields</td>
+  <td>Keep safe old defaults; request host upgrade</td>
+</tr>
+</tbody>
+</table>
+<p>These are hypothetical cohorts. The lab's implemented artifacts are listed in verification evidence; it does not fabricate historical customers or release adoption.</p>
+<h2>Rollback is more than one switch</h2>
+<table>
+<thead>
+<tr>
+  <th>Failure</th>
+  <th>Candidate action</th>
+  <th>Limit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Policy-only regression</td>
+  <td>Restore a compatible last-known-good config</td>
+  <td>Only shipped code understands that control; apply/fetch latency exists</td>
+</tr>
+<tr>
+  <td>Detector/model regression</td>
+  <td>Disable new path or select prior compatible model</td>
+  <td>Validate model input/output schema and capture impact</td>
+</tr>
+<tr>
+  <td>SDK binary crash</td>
+  <td>Partner app rollback or patch release; safe kill switch if already shipped</td>
+  <td>SDK vendor cannot instantly replace all installed app binaries</td>
+</tr>
+<tr>
+  <td>Bad database migration</td>
+  <td>Stop rollout, investigate preserved fixture, forward-fix</td>
+  <td>Downgrades may not read newer schemas; do not promise destructive rollback</td>
+</tr>
+<tr>
+  <td>Security issue</td>
+  <td>Advisory + scoped mitigation + patched versions + partner escalation</td>
+  <td>Coordinate evidence and owner communications; avoid leaking data in diagnostics</td>
+</tr>
+</tbody>
+</table>
+<h2>Partner adoption tracker template</h2>
+<table>
+<thead>
+<tr>
+  <th>Partner</th>
+  <th>Host version</th>
+  <th>SDK version</th>
+  <th>Config revision</th>
+  <th>Eligible installs</th>
+  <th>Installed share</th>
+  <th>Activated</th>
+  <th>Recording guardrails</th>
+  <th>Owner / next action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Example only</td>
+  <td>1.2.0</td>
+  <td>0.1.1</td>
+  <td>7</td>
+  <td>Unknown</td>
+  <td>Unknown</td>
+  <td>No</td>
+  <td>Not measured</td>
+  <td>Establish baseline before activation</td>
+</tr>
+</tbody>
+</table>
+<p>Never fill unknowns with optimistic estimates. Distinguish released, installed, activated and verified. Instrument the SDK version/config capability and aggregate outcome counters without raw route data where possible. Define support windows and escalation expectations before asking partners to upgrade.</p>
+<h2>On-call checklist</h2>
+<p>Establish affected app/SDK/config/OS cohorts and user impact; stop further exposure if warranted. Compare capture quality, crash/ANR, queue growth and runtime-cost signals with a matched baseline. Check concurrent host/model/backend changes. Decide whether to roll back config, pause a model, or ship a binary patch. Preserve redacted evidence and ownership. After stabilization, write a concise incident review with tests, detection improvements and customer-adoption follow-through.</p>
+<h2>Release commands</h2>
+<p>Run verification first. Create release tags only for a reviewed committed tree, then push the intended branch/tag and inspect the matching CI run. A tag is not evidence that a pipeline passed. Production signing/registry secrets belong in protected CI environments; none are stored in this repository.</p>
+</section><section id="research"><h1>Research, evidence and design implications</h1>
+<p>Reviewed <strong>November 4, 2026</strong>. Public material establishes the problem space; it does not disclose CMT's complete SDK architecture, unpublished algorithms or licensed integration contract. Links are primary sources unless explicitly marked as a discovery result. Proposed RoadSignal designs below are our decisions, not assertions about CMT internals.</p>
+<h2>Telematics SDK context</h2>
+<p><a href="https://www.cmtelematics.com/cmt-mobile-sdk/">DriveWell's public SDK page</a> describes automatic recording, driver/passenger and transport classification, risky-event insights, trip details and App+Tag programs. RoadSignal demonstrates the surrounding engineering contracts and a simpler detector. It does not reproduce those validated capabilities.</p>
+<p>The <a href="https://www.cmtelematics.com/engineering/cutting-partial-wake-locks-by-up-to-99-in-the-insurance-apps-our-sdk-powers/">November 3 wake-lock article</a> discusses both DriveWell and MobileAPI, independently controlled lock acquisition paths, reversible configuration, monitoring recording quality, and coordinating partner adoption. The reported improvements are reductions in individual apps' excessive wake-lock session rates, not portfolio-average battery savings. Our implementation uses no explicit SDK lock; its displayed comparison is a model. The operational lesson is to track shipping, activation and verified adoption separately.</p>
+<p><a href="https://www.cmtelematics.com/engineering/modernizing-android-development/">Modernizing Android Development</a> describes a modular Kotlin/Compose/Flow foundation, shared partner UI, typed DataStore persistence and centralized versions. We use modularity and reactive host state, but choose SQLite transactions for trip/outbox atomicity. A vendor's white-label UI architecture is not proof that its proprietary sensing engine has identical internals.</p>
+<p><a href="https://www.cmtelematics.com/mobility-ai-research/accurately-measuring-risk-across-commercial-vehicles/">Commercial-vehicle risk measurement</a> explains why event interpretation depends on vehicle class. RoadSignal's fixed thresholds are illustrative, with no vehicle-normalized risk claim. <a href="https://www.cmtelematics.com/mobility-ai-research/ab-testing-mobile-apps/">CMT's experimentation article</a> discusses correlated repeated observations and rollout/measurement pitfalls. Our proposed power experiment uses driver-level assignment and quality guardrails rather than treating each trip as an independent subject.</p>
+<p><a href="https://www.cmtelematics.com/get-cmts-validated-studies/">CMT's validated-studies collection</a> points to peer-reviewed and government research. That collection is a reading index, not validation of RoadSignal's detector. <a href="https://www.cmtelematics.com/news/stop-covert-data-collection-for-better-consumer-trust-and-road-safety/">CMT's privacy position</a> emphasizes consumer choice. This lab makes consent and deletion visible and keeps collection off by default.</p>
+<h2>Public SDK availability and identity checks</h2>
+<p>Public search included company/SDK names and GitHub organization/repository searches. No official Android Maven coordinates or ungated CMT integration guide were verified. Absence from this search is not proof that no public repository exists. The company <a href="https://www.cmtelematics.com/support-policy/">support policy</a> and SDK page provide a legitimate route to partner material; we did not register an account, accept partner terms, guess credentials or reverse engineer binaries.</p>
+<p><strong>Do not confuse companies:</strong> <a href="https://github.com/Mobile-Telematics">Mobile-Telematics on GitHub</a> is Damoov. Its <a href="https://docs.damoov.com/docs/add-the-sdk-to-your-app-android">Android integration guide</a> publishes its own artifact and settings. It is useful as a peer comparison, not evidence of a CMT API. The independent <code>api-evangelist/cambridge-mobile-telematics</code> profile is third-party discovery material, not official SDK documentation, and is not used to implement vendor calls.</p>
+<h2>Platform and distribution source ledger</h2>
+<table>
+<thead>
+<tr>
+  <th>Primary reference</th>
+  <th>What it constrains in this project</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><a href="https://developer.android.com/develop/sensors-and-location/location/permissions">Android location permissions</a></td>
+  <td>Foreground/approximate access and explicit runtime UX</td>
+</tr>
+<tr>
+  <td><a href="https://developer.android.com/develop/background-work/services/fgs/service-types">Foreground service types</a></td>
+  <td><code>location</code> type and foreground-service permissions</td>
+</tr>
+<tr>
+  <td><a href="https://developer.android.com/develop/background-work/services/fgs/restrictions-bg-start">Background FGS-start restrictions</a></td>
+  <td>Visible user initiation; no assumption of unrestricted background starts</td>
+</tr>
+<tr>
+  <td><a href="https://developer.android.com/training/monitoring-device-state/doze-standby">Doze and App Standby</a></td>
+  <td>Deferred background CPU/network; field coverage beyond an emulator</td>
+</tr>
+<tr>
+  <td><a href="https://developer.android.com/develop/sensors-and-location/sensors/sensors_overview">Sensors overview</a></td>
+  <td>Availability, timestamps, background restrictions and listener lifecycle</td>
+</tr>
+<tr>
+  <td><a href="https://developer.android.com/reference/android/hardware/SensorManager">SensorManager reference</a></td>
+  <td>Sampling/batching request parameters and unregistration</td>
+</tr>
+<tr>
+  <td><a href="https://source.android.com/docs/core/interaction/sensors/batching">AOSP sensor batching</a></td>
+  <td>FIFO-dependent batching and wake-up/non-wake-up distinctions</td>
+</tr>
+<tr>
+  <td><a href="https://developer.android.com/google/play/vitals/excessive-wakelock">Android excessive wake locks</a></td>
+  <td>Current vitals definition; do not substitute modeled lock duration for this metric</td>
+</tr>
+<tr>
+  <td><a href="https://developer.android.com/develop/background-work/background-tasks/awake/wakelock">Wake-lock alternatives</a></td>
+  <td>Prefer suitable platform mechanisms; explicit ownership must be justified</td>
+</tr>
+<tr>
+  <td><a href="https://developer.android.com/jetpack/androidx/releases/work">WorkManager releases and guide</a></td>
+  <td>Durable deferrable work; pinned dependency, not a real-time capture loop</td>
+</tr>
+<tr>
+  <td><a href="https://developer.android.com/privacy-and-security/keystore">Android Keystore</a></td>
+  <td>Non-exportable key API; hardware backing is device-dependent</td>
+</tr>
+<tr>
+  <td><a href="https://developer.android.com/guide/practices/sdk-best-practices">SDK user-safety guidance</a></td>
+  <td>Host disclosure and policy responsibilities</td>
+</tr>
+<tr>
+  <td><a href="https://developer.android.com/privacy-and-security/declare-data-use">Data-use declaration</a></td>
+  <td>Real SDK data collection must be represented in host disclosures</td>
+</tr>
+<tr>
+  <td><a href="https://developer.android.com/build/kotlin-support">Kotlin/AGP/R8 support</a></td>
+  <td>Verified Kotlin metadata support; AGP 8.13.2 replaced an incompatible older shrinker</td>
+</tr>
+<tr>
+  <td><a href="https://developer.android.com/build/publish-library/configure-pub-variants">Android library publication</a></td>
+  <td>Release variant, POM, Gradle metadata and dependency scopes</td>
+</tr>
+<tr>
+  <td><a href="https://kotlinlang.org/docs/gradle-binary-compatibility-validation.html">Kotlin ABI validation</a></td>
+  <td>API review; pinned Kotlin 2.3.10 exposes <code>checkLegacyAbi</code>/<code>updateLegacyAbi</code>, unlike newer documentation names</td>
+</tr>
+<tr>
+  <td><a href="https://docs.gradle.org/current/userguide/dependency_verification.html">Gradle dependency verification</a></td>
+  <td>Checksums are a reviewed trust-on-first-use input, not automatic proof</td>
+</tr>
+<tr>
+  <td><a href="https://docs.gradle.org/current/userguide/publishing_maven.html">Gradle Maven publishing</a></td>
+  <td>Actual publication metadata and consumer resolution</td>
+</tr>
+<tr>
+  <td><a href="https://semver.org/spec/v2.0.0.html">SemVer 2.0</a></td>
+  <td>Explicit API, immutable releases, and honest prerelease expectations</td>
+</tr>
+<tr>
+  <td><a href="https://docs.github.com/en/actions/how-tos/secure-your-work/use-artifact-attestations/use-artifact-attestations">GitHub artifact attestations</a></td>
+  <td>CI provenance is distinct from our unsigned local manifest</td>
+</tr>
+<tr>
+  <td><a href="https://slsa.dev/spec/v1.2/">SLSA current specification</a></td>
+  <td>Supply-chain goals; no certification/level claim is made</td>
+</tr>
+</tbody>
+</table>
+<h2>Peer/industry comparison</h2>
+<table>
+<thead>
+<tr>
+  <th>Surface</th>
+  <th>Public evidence</th>
+  <th>Lesson for an SDK designer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>CMT DriveWell / MobileAPI</td>
+  <td>Product capability material and selected engineering explanations; partner contract not verified</td>
+  <td>Keep integration claims bounded by available evidence</td>
+</tr>
+<tr>
+  <td>Damoov Android SDK</td>
+  <td>Public Maven/settings integration guide</td>
+  <td>Initialization, permissions and enable/disable contracts must be explicit; vendor identities matter</td>
+</tr>
+<tr>
+  <td>Google Driver SDK</td>
+  <td><a href="https://developers.google.com/maps/documentation/mobility/services/resources/relnotes_driver_sdk_android">Official release notes</a> describe support/dependency changes</td>
+  <td>A consumer's app can inherit compatibility changes through dependency upgrades</td>
+</tr>
+<tr>
+  <td>Android framework / Jetpack</td>
+  <td>Public execution, storage and scheduling contracts</td>
+  <td>OS policy and host-app target SDK are part of the SDK's effective runtime environment</td>
+</tr>
+</tbody>
+</table>
+<p>The common challenges are not solved by importing one library: noisy/incomplete data, battery cost, permission abandonment, device diversity, upgrade lag, backend contracts and observability all cross organizational boundaries. RoadSignal implements a tractable slice and documents the remaining production work.</p>
+</section><section id="user-journeys"><h1>Demo journeys and significance</h1>
+<p>All replay journeys are local synthetic fixtures. There is no CMT account, SDK binary, network endpoint, emergency action or validated risk score. Start on an emulator; the instrumented suite resets only this lab's data.</p>
+<table>
+<thead>
+<tr>
+  <th>Journey</th>
+  <th>Actions / expected result</th>
+  <th>SDK contract demonstrated</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>1. Inspect before consent</td>
+  <td>Explore the lab; replay is gated; view Controls</td>
+  <td>SDK initialization does not imply permission to collect</td>
+</tr>
+<tr>
+  <td>2. Enable local SDK</td>
+  <td>Controls → Enable local SDK</td>
+  <td>Durable consent, no automatic sensing</td>
+</tr>
+<tr>
+  <td>3. Replay commute</td>
+  <td>Overview → Replay commute → Trips</td>
+  <td>Armed detection, finalized trip, encrypted persistence/outbox</td>
+</tr>
+<tr>
+  <td>4. Inspect a trip</td>
+  <td>Open newest trip; view route and event timeline</td>
+  <td>Provenance, illustrative coaching, bounded event data</td>
+</tr>
+<tr>
+  <td>5. Correct role</td>
+  <td>Select Passenger or Driver</td>
+  <td>Explicit user correction, no invented automatic classification</td>
+</tr>
+<tr>
+  <td>6. Recover through a gap</td>
+  <td>Overview → Tunnel &amp; bad GPS</td>
+  <td>Reject poor accuracy; split on long gap without inventing distance</td>
+</tr>
+<tr>
+  <td>7. Impact candidate</td>
+  <td>Replay Impact candidate; inspect event</td>
+  <td>Synthetic signal extraction; no emergency dispatch</td>
+</tr>
+<tr>
+  <td>8. Explore power requests</td>
+  <td>Lab → Power; apply economy/balanced/responsive</td>
+  <td>Actual listener policy, requested versus observed behavior</td>
+</tr>
+<tr>
+  <td>9. Disable capture by policy</td>
+  <td>Start replay, then disable collection</td>
+  <td>Reversible admission/stop control; local fixture, not a remote service</td>
+</tr>
+<tr>
+  <td>10. Queue offline work</td>
+  <td>Lab → Outbox → Offline → Schedule local sync</td>
+  <td>Durable constrained WorkManager job and finite retries</td>
+</tr>
+<tr>
+  <td>11. Acknowledge/reject/recover</td>
+  <td>Select ACK or REJECT; retry dead letters explicitly</td>
+  <td>Local idempotency, error classification and recovery ownership</td>
+</tr>
+<tr>
+  <td>12. Review publication</td>
+  <td>Lab → Pipeline; run distribute script</td>
+  <td>Real Maven artifacts and an external dependency consumer</td>
+</tr>
+<tr>
+  <td>13. Partner boundary</td>
+  <td>Partners → Try mock integration / Check real SDK setup</td>
+  <td>Mock path works; unavailable vendor path fails explicitly</td>
+</tr>
+<tr>
+  <td>14. Lifecycle recovery</td>
+  <td>Recreate Activity; cold-launch process after finalized trips</td>
+  <td>Persisted journal returns; recording does not auto-restart</td>
+</tr>
+<tr>
+  <td>15. Device session</td>
+  <td>Controls → permission request → Start device session → Stop</td>
+  <td>Actual Android location FGS, notification and listener ownership</td>
+</tr>
+<tr>
+  <td>16. Revoke and delete</td>
+  <td>Controls → revoke → confirmation</td>
+  <td>Producer stop, epoch/generation invalidation and local deletion</td>
+</tr>
+</tbody>
+</table>
+<h2>Device-session expectations</h2>
+<p>The device test verifies that an actual foreground service becomes foreground and stops. It does not claim a physical drive, power result or reliable screen-off sensor coverage. An emulator may supply no provider speed or poor fixes; remaining ARMED while stationary is expected. For a physical-device evaluation, obtain the user's explicit permission, follow applicable platform policies, and use a passenger/operator to run the test rather than interacting while driving.</p>
+<p>The host's approximate-location choice can legitimately prevent valid detection under this prototype's accuracy gate. Missing linear/gyro hardware degrades features rather than justifying hidden additional permissions. The sample never asks for battery-optimization exemption.</p>
+<h2>Automated capture</h2>
+<p><code>ShowcaseJourneyTest</code> captures native screenshots while executing synthetic flows. <code>ColdStartTest</code> checks persisted fixtures after a separate process launch. <code>DeviceAndPrivacyTest</code> verifies FGS lifecycle and deletion. Run them using <code>scripts/instrumented.sh</code>, which preserves their intended setup order. The saved PNGs are real emulator output; no image generator or fabricated vendor UI is used.</p>
+</section><section id="verification"><h1>Verification evidence</h1>
+<p>Verified locally on <strong>November 4, 2026</strong>. There are <strong>34 distinct test cases</strong>: 20 JVM behavior tests, 11 Android SDK tests, and 3 host tests. The Android cases passed on both devices below; do not count repeated device runs as additional distinct tests.</p>
+<table>
+<thead>
+<tr>
+  <th>Check</th>
+  <th>Observed result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Core reducer/policy/retry tests</td>
+  <td>20 passed, zero failures/errors</td>
+</tr>
+<tr>
+  <td>Android 15 / API 35 / ARM64 / 4 KB pages</td>
+  <td>11 SDK tests + showcase, cold process and device/privacy tests passed</td>
+</tr>
+<tr>
+  <td>Android 16 / API 36 / ARM64 / 16 KB pages</td>
+  <td>Same 14 Android cases passed</td>
+</tr>
+<tr>
+  <td>Presentation refresh / Android 16 / 16 KB pages</td>
+  <td>14 Android cases passed after the host footer update; 18 native captures refreshed at 1080×2424</td>
+</tr>
+<tr>
+  <td>Native screenshot capture</td>
+  <td>18 final PNGs; no generated or altered UI images</td>
+</tr>
+<tr>
+  <td>Actual location FGS</td>
+  <td>Became foreground with runtime permissions, then stopped; confirmed separately from SDK state</td>
+</tr>
+<tr>
+  <td>Cold-process restart</td>
+  <td>Finalized journal reloaded; capture remained stopped</td>
+</tr>
+<tr>
+  <td>Encryption/schema</td>
+  <td>Actual Keystore/SQLite round trip, encrypted-payload inspection and v1→v2 fixture migration passed</td>
+</tr>
+<tr>
+  <td>Privacy/concurrency</td>
+  <td>Final revocation wins concurrent replay/config commands; old consent epochs cannot save</td>
+</tr>
+<tr>
+  <td>Delivery</td>
+  <td>Retry-once, bounded offline retry, permanent failure, explicit dead-letter recovery and local idempotent receipts passed</td>
+</tr>
+<tr>
+  <td>Policy</td>
+  <td>Revision/TTL admission, active expiry, disable and subsequent-start rejection passed</td>
+</tr>
+<tr>
+  <td>Debug and minified release</td>
+  <td>Built with AGP 8.13.2/Kotlin 2.3.10; earlier incompatible shrinker was replaced</td>
+</tr>
+<tr>
+  <td>Lint</td>
+  <td>Release checks pass; intentional old-target warning is tracked below</td>
+</tr>
+<tr>
+  <td>Public contract</td>
+  <td>Core ABI and Android/bridge public JVM descriptor baselines pass</td>
+</tr>
+<tr>
+  <td>Merged manifest</td>
+  <td>Location FGS boundary, no background-location/internet permission, WorkManager rescheduling surface checked</td>
+</tr>
+<tr>
+  <td>Published consumer</td>
+  <td>All three components resolved as external Maven modules; debug and minified builds pass</td>
+</tr>
+<tr>
+  <td>Contained publication</td>
+  <td>Core JAR, two AARs, POM/module metadata/source artifacts, Maven ZIP/checksums/unsigned local manifest produced</td>
+</tr>
+<tr>
+  <td>Documentation</td>
+  <td>Local Markdown/image links verified; portable reading copy generated separately</td>
+</tr>
+</tbody>
+</table>
+<p>The project intentionally targets SDK 36 while testing on newer hosts where available; lint can flag this relative to the latest platform. This is an explicit pinned prototype support decision, not a claim of the newest target-SDK policy compliance for a future Play submission. The manifest includes explicit backup/transfer exclusions. See <a href="https://github.com/phillipsk/RoadSignalLab/blob/main/docs/verification-evidence.json">machine-readable evidence</a> and <a href="https://github.com/phillipsk/RoadSignalLab/blob/main/docs/screenshots/capture-manifest.json">capture provenance</a>.</p>
+<h2>Remote execution</h2>
+<p>The CI workflow builds debug/minified apps, checks public APIs and manifests, consumes the published Maven artifacts, and runs all 14 Android cases on API 31/35/36 x86_64 emulators. The version-tag job builds and attests the exact release ZIP/APK before attaching them to the matching release. Results for the current source revision will be linked after execution. Configured jobs are not counted as passed tests.</p>
+<h2>UI-test stability observation</h2>
+<p>An API 36 showcase run previously failed with Compose's <code>Detected multithreaded access to SnapshotStateObserver</code> exception after all 11 SDK cases passed. A targeted retry passed all 14 Android cases. The root cause remains unestablished; a successful retry is not a fix or a measured flake rate. Further isolation should examine test-clock/draw synchronization and Compose/platform versions.</p>
+<h2>Scope limits</h2>
+<p>No licensed CMT SDK transaction or backend call was run. No physical road test, energy measurement, Android vitals collection, sensor-FIFO validation, validated safety model or production deployment is claimed. The default walkthrough is synthetic. Device testing verifies actual foreground-service lifecycle separately from physical capture quality. Finalized-state restart tests do not establish continuity of an active trip across process death. Core descriptor checks and a recompiled/shrunk consumer are not a frozen-old-binary compatibility test.</p>
+</section><footer class="small">Prepared November 4, 2026. Review the verification evidence and implementation boundaries when evaluating the SDK. No affiliation with Cambridge Mobile Telematics is implied.</footer></main></body></html>

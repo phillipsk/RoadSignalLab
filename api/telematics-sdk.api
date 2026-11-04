@@ -1,0 +1,417 @@
+public final class io.roadsignal.sdk.RoadSignal {
+  public static final io.roadsignal.sdk.RoadSignal$Companion Companion;
+    descriptor: Lio/roadsignal/sdk/RoadSignal$Companion;
+  public static final java.lang.String VERSION;
+    descriptor: Ljava/lang/String;
+
+  public final kotlinx.coroutines.flow.StateFlow<io.roadsignal.sdk.SdkSnapshot> getState();
+    descriptor: ()Lkotlinx/coroutines/flow/StateFlow;
+
+  public final java.lang.Object awaitReady(kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    descriptor: (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+
+  public final java.lang.Object grantConsent(kotlin.coroutines.Continuation<? super io.roadsignal.sdk.SdkResult>);
+    descriptor: (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+
+  public final java.lang.Object revokeConsentAndDelete(kotlin.coroutines.Continuation<? super io.roadsignal.sdk.SdkResult>);
+    descriptor: (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+
+  public final java.lang.Object startReplay(io.roadsignal.core.ReplayScenario, long, kotlin.coroutines.Continuation<? super io.roadsignal.sdk.SdkResult>);
+    descriptor: (Lio/roadsignal/core/ReplayScenario;JLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+
+  public static java.lang.Object startReplay$default(io.roadsignal.sdk.RoadSignal, io.roadsignal.core.ReplayScenario, long, kotlin.coroutines.Continuation, int, java.lang.Object);
+    descriptor: (Lio/roadsignal/sdk/RoadSignal;Lio/roadsignal/core/ReplayScenario;JLkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+
+  public final java.lang.Object startLiveFromVisibleActivity(android.app.Activity, kotlin.coroutines.Continuation<? super io.roadsignal.sdk.SdkResult>);
+    descriptor: (Landroid/app/Activity;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+
+  public final java.lang.Object stop(kotlin.coroutines.Continuation<? super io.roadsignal.sdk.SdkResult>);
+    descriptor: (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+
+  public final java.lang.Object applyPolicy(io.roadsignal.core.CapturePolicy, kotlin.coroutines.Continuation<? super io.roadsignal.sdk.SdkResult>);
+    descriptor: (Lio/roadsignal/core/CapturePolicy;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+
+  public final java.lang.Object classifyTrip(java.lang.String, io.roadsignal.core.TripRole, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    descriptor: (Ljava/lang/String;Lio/roadsignal/core/TripRole;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+
+  public final java.lang.Object setUploadSimulation(io.roadsignal.sdk.UploadSimulation, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    descriptor: (Lio/roadsignal/sdk/UploadSimulation;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+
+  public final java.lang.Object retryDeadLetters(kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    descriptor: (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+
+  public final void enqueueUpload();
+    descriptor: ()V
+
+  public final java.lang.Object refresh(kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    descriptor: (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+
+
+
+
+
+  public final java.util.List<io.roadsignal.sdk.SensorCapability> sensorCapabilities();
+    descriptor: ()Ljava/util/List;
+
+  public static final io.roadsignal.sdk.RoadSignal get(android.content.Context);
+    descriptor: (Landroid/content/Context;)Lio/roadsignal/sdk/RoadSignal;
+
+  public static final java.util.concurrent.atomic.AtomicLong access$getGeneration$p(io.roadsignal.sdk.RoadSignal);
+    descriptor: (Lio/roadsignal/sdk/RoadSignal;)Ljava/util/concurrent/atomic/AtomicLong;
+
+  public static final kotlinx.coroutines.Job access$getReplay$p(io.roadsignal.sdk.RoadSignal);
+    descriptor: (Lio/roadsignal/sdk/RoadSignal;)Lkotlinx/coroutines/Job;
+
+  public static final android.content.Context access$getContext$p(io.roadsignal.sdk.RoadSignal);
+    descriptor: (Lio/roadsignal/sdk/RoadSignal;)Landroid/content/Context;
+
+  public static final kotlinx.coroutines.flow.MutableStateFlow access$getMutable$p(io.roadsignal.sdk.RoadSignal);
+    descriptor: (Lio/roadsignal/sdk/RoadSignal;)Lkotlinx/coroutines/flow/MutableStateFlow;
+
+  public static final kotlinx.coroutines.sync.Mutex access$getMutex$p(io.roadsignal.sdk.RoadSignal);
+    descriptor: (Lio/roadsignal/sdk/RoadSignal;)Lkotlinx/coroutines/sync/Mutex;
+
+  public static final void access$stopLocked(io.roadsignal.sdk.RoadSignal);
+    descriptor: (Lio/roadsignal/sdk/RoadSignal;)V
+
+  public static final void access$notice(io.roadsignal.sdk.RoadSignal, java.lang.String);
+    descriptor: (Lio/roadsignal/sdk/RoadSignal;Ljava/lang/String;)V
+
+  public static final io.roadsignal.core.TripEngine access$getEngine$p(io.roadsignal.sdk.RoadSignal);
+    descriptor: (Lio/roadsignal/sdk/RoadSignal;)Lio/roadsignal/core/TripEngine;
+
+  public static final io.roadsignal.sdk.internal.TripStore access$getStore$p(io.roadsignal.sdk.RoadSignal);
+    descriptor: (Lio/roadsignal/sdk/RoadSignal;)Lio/roadsignal/sdk/internal/TripStore;
+
+  public static final void access$refreshLocked(io.roadsignal.sdk.RoadSignal);
+    descriptor: (Lio/roadsignal/sdk/RoadSignal;)V
+
+  public static final io.roadsignal.core.CapturePolicy access$getPolicy$p(io.roadsignal.sdk.RoadSignal);
+    descriptor: (Lio/roadsignal/sdk/RoadSignal;)Lio/roadsignal/core/CapturePolicy;
+
+  public static final java.lang.Object access$serialized(io.roadsignal.sdk.RoadSignal, kotlin.jvm.functions.Function0, kotlin.coroutines.Continuation);
+    descriptor: (Lio/roadsignal/sdk/RoadSignal;Lkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+
+  public static final io.roadsignal.sdk.RoadSignal access$getInstance$cp();
+    descriptor: ()Lio/roadsignal/sdk/RoadSignal;
+
+  public io.roadsignal.sdk.RoadSignal(android.content.Context, kotlin.jvm.internal.DefaultConstructorMarker);
+    descriptor: (Landroid/content/Context;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+
+  public static final void access$setInstance$cp(io.roadsignal.sdk.RoadSignal);
+    descriptor: (Lio/roadsignal/sdk/RoadSignal;)V
+
+  public static final kotlinx.coroutines.channels.Channel access$getSamples$p(io.roadsignal.sdk.RoadSignal);
+    descriptor: (Lio/roadsignal/sdk/RoadSignal;)Lkotlinx/coroutines/channels/Channel;
+
+  public static final void access$acceptLocked(io.roadsignal.sdk.RoadSignal, io.roadsignal.core.MotionSample);
+    descriptor: (Lio/roadsignal/sdk/RoadSignal;Lio/roadsignal/core/MotionSample;)V
+}
+public final class io.roadsignal.sdk.RoadSignal$Companion {
+  public final io.roadsignal.sdk.RoadSignal get(android.content.Context);
+    descriptor: (Landroid/content/Context;)Lio/roadsignal/sdk/RoadSignal;
+
+  public io.roadsignal.sdk.RoadSignal$Companion(kotlin.jvm.internal.DefaultConstructorMarker);
+    descriptor: (Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+public final class io.roadsignal.sdk.SdkResult {
+  public io.roadsignal.sdk.SdkResult(boolean, java.lang.String);
+    descriptor: (ZLjava/lang/String;)V
+
+  public final boolean getAccepted();
+    descriptor: ()Z
+
+  public final java.lang.String getMessage();
+    descriptor: ()Ljava/lang/String;
+
+  public final boolean component1();
+    descriptor: ()Z
+
+  public final java.lang.String component2();
+    descriptor: ()Ljava/lang/String;
+
+  public final io.roadsignal.sdk.SdkResult copy(boolean, java.lang.String);
+    descriptor: (ZLjava/lang/String;)Lio/roadsignal/sdk/SdkResult;
+
+  public static io.roadsignal.sdk.SdkResult copy$default(io.roadsignal.sdk.SdkResult, boolean, java.lang.String, int, java.lang.Object);
+    descriptor: (Lio/roadsignal/sdk/SdkResult;ZLjava/lang/String;ILjava/lang/Object;)Lio/roadsignal/sdk/SdkResult;
+
+  public java.lang.String toString();
+    descriptor: ()Ljava/lang/String;
+
+  public int hashCode();
+    descriptor: ()I
+
+  public boolean equals(java.lang.Object);
+    descriptor: (Ljava/lang/Object;)Z
+}
+public final class io.roadsignal.sdk.SdkSnapshot {
+  public io.roadsignal.sdk.SdkSnapshot(boolean, long, io.roadsignal.core.RecordingState, io.roadsignal.core.SourceMode, java.util.List<io.roadsignal.core.TripSummary>, double, long, long, long, int, int, int, int, io.roadsignal.core.PowerProfile, long, io.roadsignal.sdk.UploadSimulation, java.util.List<java.lang.String>, java.lang.String);
+    descriptor: (ZJLio/roadsignal/core/RecordingState;Lio/roadsignal/core/SourceMode;Ljava/util/List;DJJJIIIILio/roadsignal/core/PowerProfile;JLio/roadsignal/sdk/UploadSimulation;Ljava/util/List;Ljava/lang/String;)V
+
+  public io.roadsignal.sdk.SdkSnapshot(boolean, long, io.roadsignal.core.RecordingState, io.roadsignal.core.SourceMode, java.util.List, double, long, long, long, int, int, int, int, io.roadsignal.core.PowerProfile, long, io.roadsignal.sdk.UploadSimulation, java.util.List, java.lang.String, int, kotlin.jvm.internal.DefaultConstructorMarker);
+    descriptor: (ZJLio/roadsignal/core/RecordingState;Lio/roadsignal/core/SourceMode;Ljava/util/List;DJJJIIIILio/roadsignal/core/PowerProfile;JLio/roadsignal/sdk/UploadSimulation;Ljava/util/List;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+
+  public final boolean getConsent();
+    descriptor: ()Z
+
+  public final long getConsentEpoch();
+    descriptor: ()J
+
+  public final io.roadsignal.core.RecordingState getRecording();
+    descriptor: ()Lio/roadsignal/core/RecordingState;
+
+  public final io.roadsignal.core.SourceMode getSource();
+    descriptor: ()Lio/roadsignal/core/SourceMode;
+
+  public final java.util.List<io.roadsignal.core.TripSummary> getTrips();
+    descriptor: ()Ljava/util/List;
+
+  public final double getLatestRotationRadPerSec();
+    descriptor: ()D
+
+  public final long getAcceptedSamples();
+    descriptor: ()J
+
+  public final long getRejectedSamples();
+    descriptor: ()J
+
+  public final long getDroppedSamples();
+    descriptor: ()J
+
+  public final int getPendingUploads();
+    descriptor: ()I
+
+  public final int getDeadLetters();
+    descriptor: ()I
+
+  public final int getLocalReceipts();
+    descriptor: ()I
+
+  public final int getUnreadableRecords();
+    descriptor: ()I
+
+  public final io.roadsignal.core.PowerProfile getProfile();
+    descriptor: ()Lio/roadsignal/core/PowerProfile;
+
+  public final long getPolicyRevision();
+    descriptor: ()J
+
+  public final io.roadsignal.sdk.UploadSimulation getUploadSimulation();
+    descriptor: ()Lio/roadsignal/sdk/UploadSimulation;
+
+  public final java.util.List<java.lang.String> getDiagnostics();
+    descriptor: ()Ljava/util/List;
+
+  public final java.lang.String getNotice();
+    descriptor: ()Ljava/lang/String;
+
+  public final boolean component1();
+    descriptor: ()Z
+
+  public final long component2();
+    descriptor: ()J
+
+  public final io.roadsignal.core.RecordingState component3();
+    descriptor: ()Lio/roadsignal/core/RecordingState;
+
+  public final io.roadsignal.core.SourceMode component4();
+    descriptor: ()Lio/roadsignal/core/SourceMode;
+
+  public final java.util.List<io.roadsignal.core.TripSummary> component5();
+    descriptor: ()Ljava/util/List;
+
+  public final double component6();
+    descriptor: ()D
+
+  public final long component7();
+    descriptor: ()J
+
+  public final long component8();
+    descriptor: ()J
+
+  public final long component9();
+    descriptor: ()J
+
+  public final int component10();
+    descriptor: ()I
+
+  public final int component11();
+    descriptor: ()I
+
+  public final int component12();
+    descriptor: ()I
+
+  public final int component13();
+    descriptor: ()I
+
+  public final io.roadsignal.core.PowerProfile component14();
+    descriptor: ()Lio/roadsignal/core/PowerProfile;
+
+  public final long component15();
+    descriptor: ()J
+
+  public final io.roadsignal.sdk.UploadSimulation component16();
+    descriptor: ()Lio/roadsignal/sdk/UploadSimulation;
+
+  public final java.util.List<java.lang.String> component17();
+    descriptor: ()Ljava/util/List;
+
+  public final java.lang.String component18();
+    descriptor: ()Ljava/lang/String;
+
+  public final io.roadsignal.sdk.SdkSnapshot copy(boolean, long, io.roadsignal.core.RecordingState, io.roadsignal.core.SourceMode, java.util.List<io.roadsignal.core.TripSummary>, double, long, long, long, int, int, int, int, io.roadsignal.core.PowerProfile, long, io.roadsignal.sdk.UploadSimulation, java.util.List<java.lang.String>, java.lang.String);
+    descriptor: (ZJLio/roadsignal/core/RecordingState;Lio/roadsignal/core/SourceMode;Ljava/util/List;DJJJIIIILio/roadsignal/core/PowerProfile;JLio/roadsignal/sdk/UploadSimulation;Ljava/util/List;Ljava/lang/String;)Lio/roadsignal/sdk/SdkSnapshot;
+
+  public static io.roadsignal.sdk.SdkSnapshot copy$default(io.roadsignal.sdk.SdkSnapshot, boolean, long, io.roadsignal.core.RecordingState, io.roadsignal.core.SourceMode, java.util.List, double, long, long, long, int, int, int, int, io.roadsignal.core.PowerProfile, long, io.roadsignal.sdk.UploadSimulation, java.util.List, java.lang.String, int, java.lang.Object);
+    descriptor: (Lio/roadsignal/sdk/SdkSnapshot;ZJLio/roadsignal/core/RecordingState;Lio/roadsignal/core/SourceMode;Ljava/util/List;DJJJIIIILio/roadsignal/core/PowerProfile;JLio/roadsignal/sdk/UploadSimulation;Ljava/util/List;Ljava/lang/String;ILjava/lang/Object;)Lio/roadsignal/sdk/SdkSnapshot;
+
+  public java.lang.String toString();
+    descriptor: ()Ljava/lang/String;
+
+  public int hashCode();
+    descriptor: ()I
+
+  public boolean equals(java.lang.Object);
+    descriptor: (Ljava/lang/Object;)Z
+
+  public io.roadsignal.sdk.SdkSnapshot();
+    descriptor: ()V
+}
+public final class io.roadsignal.sdk.SensorCapability {
+  public io.roadsignal.sdk.SensorCapability(java.lang.String, boolean, boolean, int);
+    descriptor: (Ljava/lang/String;ZZI)V
+
+  public final java.lang.String getType();
+    descriptor: ()Ljava/lang/String;
+
+  public final boolean getAvailable();
+    descriptor: ()Z
+
+  public final boolean getWakeUp();
+    descriptor: ()Z
+
+  public final int getFifoMaxEvents();
+    descriptor: ()I
+
+  public final java.lang.String component1();
+    descriptor: ()Ljava/lang/String;
+
+  public final boolean component2();
+    descriptor: ()Z
+
+  public final boolean component3();
+    descriptor: ()Z
+
+  public final int component4();
+    descriptor: ()I
+
+  public final io.roadsignal.sdk.SensorCapability copy(java.lang.String, boolean, boolean, int);
+    descriptor: (Ljava/lang/String;ZZI)Lio/roadsignal/sdk/SensorCapability;
+
+  public static io.roadsignal.sdk.SensorCapability copy$default(io.roadsignal.sdk.SensorCapability, java.lang.String, boolean, boolean, int, int, java.lang.Object);
+    descriptor: (Lio/roadsignal/sdk/SensorCapability;Ljava/lang/String;ZZIILjava/lang/Object;)Lio/roadsignal/sdk/SensorCapability;
+
+  public java.lang.String toString();
+    descriptor: ()Ljava/lang/String;
+
+  public int hashCode();
+    descriptor: ()I
+
+  public boolean equals(java.lang.Object);
+    descriptor: (Ljava/lang/Object;)Z
+}
+public final class io.roadsignal.sdk.SyncReport {
+  public io.roadsignal.sdk.SyncReport(int, int, int, boolean);
+    descriptor: (IIIZ)V
+
+  public io.roadsignal.sdk.SyncReport(int, int, int, boolean, int, kotlin.jvm.internal.DefaultConstructorMarker);
+    descriptor: (IIIZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+
+  public final int getAcknowledged();
+    descriptor: ()I
+
+  public final int getRetryable();
+    descriptor: ()I
+
+  public final int getDeadLetters();
+    descriptor: ()I
+
+  public final boolean getConsentBlocked();
+    descriptor: ()Z
+
+  public final int component1();
+    descriptor: ()I
+
+  public final int component2();
+    descriptor: ()I
+
+  public final int component3();
+    descriptor: ()I
+
+  public final boolean component4();
+    descriptor: ()Z
+
+  public final io.roadsignal.sdk.SyncReport copy(int, int, int, boolean);
+    descriptor: (IIIZ)Lio/roadsignal/sdk/SyncReport;
+
+  public static io.roadsignal.sdk.SyncReport copy$default(io.roadsignal.sdk.SyncReport, int, int, int, boolean, int, java.lang.Object);
+    descriptor: (Lio/roadsignal/sdk/SyncReport;IIIZILjava/lang/Object;)Lio/roadsignal/sdk/SyncReport;
+
+  public java.lang.String toString();
+    descriptor: ()Ljava/lang/String;
+
+  public int hashCode();
+    descriptor: ()I
+
+  public boolean equals(java.lang.Object);
+    descriptor: (Ljava/lang/Object;)Z
+}
+public final class io.roadsignal.sdk.UploadSimulation extends java.lang.Enum<io.roadsignal.sdk.UploadSimulation> {
+  public static final io.roadsignal.sdk.UploadSimulation ACKNOWLEDGE;
+    descriptor: Lio/roadsignal/sdk/UploadSimulation;
+  public static final io.roadsignal.sdk.UploadSimulation OFFLINE;
+    descriptor: Lio/roadsignal/sdk/UploadSimulation;
+  public static final io.roadsignal.sdk.UploadSimulation RETRY_ONCE;
+    descriptor: Lio/roadsignal/sdk/UploadSimulation;
+  public static final io.roadsignal.sdk.UploadSimulation REJECT;
+    descriptor: Lio/roadsignal/sdk/UploadSimulation;
+  public static io.roadsignal.sdk.UploadSimulation[] values();
+    descriptor: ()[Lio/roadsignal/sdk/UploadSimulation;
+
+  public static io.roadsignal.sdk.UploadSimulation valueOf(java.lang.String);
+    descriptor: (Ljava/lang/String;)Lio/roadsignal/sdk/UploadSimulation;
+
+  public static kotlin.enums.EnumEntries<io.roadsignal.sdk.UploadSimulation> getEntries();
+    descriptor: ()Lkotlin/enums/EnumEntries;
+}
+public final class io.roadsignal.sdk.JavaRoadSignalClient implements java.io.Closeable {
+  public io.roadsignal.sdk.JavaRoadSignalClient(android.content.Context);
+    descriptor: (Landroid/content/Context;)V
+
+  public final void grantConsent(io.roadsignal.sdk.JavaRoadSignalClient$Callback);
+    descriptor: (Lio/roadsignal/sdk/JavaRoadSignalClient$Callback;)V
+
+  public final void replay(io.roadsignal.core.ReplayScenario, io.roadsignal.sdk.JavaRoadSignalClient$Callback);
+    descriptor: (Lio/roadsignal/core/ReplayScenario;Lio/roadsignal/sdk/JavaRoadSignalClient$Callback;)V
+
+  public final void revokeConsentAndDelete(io.roadsignal.sdk.JavaRoadSignalClient$Callback);
+    descriptor: (Lio/roadsignal/sdk/JavaRoadSignalClient$Callback;)V
+
+  public final java.io.Closeable observe(io.roadsignal.sdk.JavaRoadSignalClient$StateListener);
+    descriptor: (Lio/roadsignal/sdk/JavaRoadSignalClient$StateListener;)Ljava/io/Closeable;
+
+  public void close();
+    descriptor: ()V
+
+  public static final io.roadsignal.sdk.RoadSignal access$getSdk$p(io.roadsignal.sdk.JavaRoadSignalClient);
+    descriptor: (Lio/roadsignal/sdk/JavaRoadSignalClient;)Lio/roadsignal/sdk/RoadSignal;
+}
+public interface io.roadsignal.sdk.JavaRoadSignalClient$Callback {
+  public abstract void onComplete(io.roadsignal.sdk.SdkResult);
+    descriptor: (Lio/roadsignal/sdk/SdkResult;)V
+}
+public interface io.roadsignal.sdk.JavaRoadSignalClient$StateListener {
+  public abstract void onState(io.roadsignal.sdk.SdkSnapshot);
+    descriptor: (Lio/roadsignal/sdk/SdkSnapshot;)V
+}

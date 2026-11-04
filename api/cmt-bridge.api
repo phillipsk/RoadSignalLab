@@ -1,0 +1,37 @@
+public interface io.roadsignal.cmt.PartnerTelematicsPort {
+  public abstract java.lang.String getIntegrationMode();
+    descriptor: ()Ljava/lang/String;
+
+  public abstract java.lang.Object demonstrateTrip(kotlin.coroutines.Continuation<? super io.roadsignal.sdk.SdkResult>);
+    descriptor: (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+public final class io.roadsignal.cmt.MockCmtAdapter implements io.roadsignal.cmt.PartnerTelematicsPort {
+  public io.roadsignal.cmt.MockCmtAdapter(io.roadsignal.sdk.RoadSignal);
+    descriptor: (Lio/roadsignal/sdk/RoadSignal;)V
+
+  public java.lang.String getIntegrationMode();
+    descriptor: ()Ljava/lang/String;
+
+  public java.lang.Object demonstrateTrip(kotlin.coroutines.Continuation<? super io.roadsignal.sdk.SdkResult>);
+    descriptor: (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+public final class io.roadsignal.cmt.UnconfiguredCmtAdapter implements io.roadsignal.cmt.PartnerTelematicsPort {
+  public io.roadsignal.cmt.UnconfiguredCmtAdapter();
+    descriptor: ()V
+
+  public java.lang.String getIntegrationMode();
+    descriptor: ()Ljava/lang/String;
+
+  public java.lang.Object demonstrateTrip(kotlin.coroutines.Continuation<? super io.roadsignal.sdk.SdkResult>);
+    descriptor: (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+public final class io.roadsignal.cmt.CmtIntegrationInfo {
+  public static final io.roadsignal.cmt.CmtIntegrationInfo INSTANCE;
+    descriptor: Lio/roadsignal/cmt/CmtIntegrationInfo;
+  public static final java.lang.String MODE;
+    descriptor: Ljava/lang/String;
+  public static final java.lang.String PUBLIC_SDK_PAGE;
+    descriptor: Ljava/lang/String;
+  public static final java.lang.String ACCESS_NOTE;
+    descriptor: Ljava/lang/String;
+}

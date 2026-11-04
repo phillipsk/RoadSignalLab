@@ -1,0 +1,127 @@
+name: Android SDK verification
+on:
+  push:
+    branches: [main, 'release/**']
+    tags: ['v*']
+    paths-ignore: ['docs/**', 'README.md', 'CHANGELOG.md', 'NOTICE', 'LICENSE', 'AGENTS.md', 'CLAUDE.md']
+  pull_request:
+    paths-ignore: ['docs/**', 'README.md', 'CHANGELOG.md', 'NOTICE', 'LICENSE', 'AGENTS.md', 'CLAUDE.md']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: sdk-ci-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
+      - run: sdkmanager 'platforms;android-36' 'build-tools;35.0.0'
+      - uses: gradle/actions/setup-gradle@0b6dd653ba04f4f93bf581ec31e66cbd7dcb644d # v4
+      - run: scripts/verify.sh
+      - run: scripts/distribute.sh
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: roadsignal-sdk-distribution
+          path: |
+            build/distribution/
+            sample-app/build/outputs/apk/debug/*.apk
+            **/build/reports/
+          retention-days: 14
+  device:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [31, 35, 36]
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@0b6dd653ba04f4f93bf581ec31e66cbd7dcb644d # v4
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
+      - run: sdkmanager 'platforms;android-36' 'build-tools;35.0.0'
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: ReactiveCircus/android-emulator-runner@4c44018e59b437e86cdfc41da381398f93ed8808 # v2
+        with:
+          api-level: ${{ matrix.api }}
+          arch: x86_64
+          profile: pixel_2
+          target: google_apis
+          disable-animations: true
+          script: scripts/instrumented.sh
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: device-evidence-api-${{ matrix.api }}
+          path: |
+            build/captures/
+            build/device-results/
+            **/build/reports/androidTests/
+            **/build/outputs/androidTest-results/
+          retention-days: 14
+  attest:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [build, device]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
+      - run: sdkmanager 'platforms;android-36' 'build-tools;35.0.0'
+      - name: Verify tag matches artifact version
+        run: test "${GITHUB_REF_NAME}" = "v$(sed -n 's/^sdkVersion=//p' gradle.properties)"
+      - run: scripts/distribute.sh
+      - name: Build demo APK for the release
+        run: |
+          ./gradlew --no-daemon :sample-app:assembleDebug
+          cp sample-app/build/outputs/apk/debug/sample-app-debug.apk build/distribution/RoadSignalLab-${GITHUB_REF_NAME#v}-debug.apk
+          cd build/distribution
+          sha256sum ./*.apk >> SHA256SUMS
+      - uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
+        with:
+          subject-path: |
+            build/distribution/roadsignal-maven-*.zip
+            build/distribution/*.apk
+      - name: Attach the exact attested binaries to the existing release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "$GITHUB_REF_NAME" build/distribution/* --repo "$GITHUB_REPOSITORY"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: attested-sdk-distribution
+          path: build/distribution/

@@ -1,0 +1,281 @@
+public final class io/roadsignal/core/CapturePolicy {
+	public fun <init> (JZLio/roadsignal/core/PowerProfile;J)V
+	public final fun component1 ()J
+	public final fun component2 ()Z
+	public final fun component3 ()Lio/roadsignal/core/PowerProfile;
+	public final fun component4 ()J
+	public final fun copy (JZLio/roadsignal/core/PowerProfile;J)Lio/roadsignal/core/CapturePolicy;
+	public static synthetic fun copy$default (Lio/roadsignal/core/CapturePolicy;JZLio/roadsignal/core/PowerProfile;JILjava/lang/Object;)Lio/roadsignal/core/CapturePolicy;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getEnabled ()Z
+	public final fun getExpiresAtEpochMs ()J
+	public final fun getProfile ()Lio/roadsignal/core/PowerProfile;
+	public final fun getRevision ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/roadsignal/core/DeliveryAction : java/lang/Enum {
+	public static final field ACKNOWLEDGE Lio/roadsignal/core/DeliveryAction;
+	public static final field DEAD_LETTER Lio/roadsignal/core/DeliveryAction;
+	public static final field RETRY Lio/roadsignal/core/DeliveryAction;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/roadsignal/core/DeliveryAction;
+	public static fun values ()[Lio/roadsignal/core/DeliveryAction;
+}
+
+public final class io/roadsignal/core/DeliveryResult : java/lang/Enum {
+	public static final field ACK Lio/roadsignal/core/DeliveryResult;
+	public static final field PERMANENT_FAILURE Lio/roadsignal/core/DeliveryResult;
+	public static final field RETRYABLE Lio/roadsignal/core/DeliveryResult;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/roadsignal/core/DeliveryResult;
+	public static fun values ()[Lio/roadsignal/core/DeliveryResult;
+}
+
+public final class io/roadsignal/core/DrivingEvent {
+	public fun <init> (Lio/roadsignal/core/EventKind;JD)V
+	public final fun component1 ()Lio/roadsignal/core/EventKind;
+	public final fun component2 ()J
+	public final fun component3 ()D
+	public final fun copy (Lio/roadsignal/core/EventKind;JD)Lio/roadsignal/core/DrivingEvent;
+	public static synthetic fun copy$default (Lio/roadsignal/core/DrivingEvent;Lio/roadsignal/core/EventKind;JDILjava/lang/Object;)Lio/roadsignal/core/DrivingEvent;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getElapsedMs ()J
+	public final fun getKind ()Lio/roadsignal/core/EventKind;
+	public final fun getMagnitude ()D
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/roadsignal/core/EngineConfig {
+	public fun <init> ()V
+	public fun <init> (DIDJJDDJ)V
+	public synthetic fun <init> (DIDJJDDJILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()D
+	public final fun component2 ()I
+	public final fun component3 ()D
+	public final fun component4 ()J
+	public final fun component5 ()J
+	public final fun component6 ()D
+	public final fun component7 ()D
+	public final fun component8 ()J
+	public final fun copy (DIDJJDDJ)Lio/roadsignal/core/EngineConfig;
+	public static synthetic fun copy$default (Lio/roadsignal/core/EngineConfig;DIDJJDDJILjava/lang/Object;)Lio/roadsignal/core/EngineConfig;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getEventCooldownMs ()J
+	public final fun getMaxAccuracyMeters ()D
+	public final fun getMaxGapMs ()J
+	public final fun getMaxSpeedMps ()D
+	public final fun getStartSamples ()I
+	public final fun getStartSpeedMps ()D
+	public final fun getStopDwellMs ()J
+	public final fun getStopSpeedMps ()D
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/roadsignal/core/EngineUpdate {
+	public fun <init> (Lio/roadsignal/core/RecordingState;Lio/roadsignal/core/TripSummary;Ljava/lang/String;)V
+	public synthetic fun <init> (Lio/roadsignal/core/RecordingState;Lio/roadsignal/core/TripSummary;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Lio/roadsignal/core/RecordingState;
+	public final fun component2 ()Lio/roadsignal/core/TripSummary;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun copy (Lio/roadsignal/core/RecordingState;Lio/roadsignal/core/TripSummary;Ljava/lang/String;)Lio/roadsignal/core/EngineUpdate;
+	public static synthetic fun copy$default (Lio/roadsignal/core/EngineUpdate;Lio/roadsignal/core/RecordingState;Lio/roadsignal/core/TripSummary;Ljava/lang/String;ILjava/lang/Object;)Lio/roadsignal/core/EngineUpdate;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCompleted ()Lio/roadsignal/core/TripSummary;
+	public final fun getRejectedReason ()Ljava/lang/String;
+	public final fun getState ()Lio/roadsignal/core/RecordingState;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/roadsignal/core/EventKind : java/lang/Enum {
+	public static final field HARD_BRAKE Lio/roadsignal/core/EventKind;
+	public static final field IMPACT_CANDIDATE Lio/roadsignal/core/EventKind;
+	public static final field PHONE_HANDLING_FIXTURE Lio/roadsignal/core/EventKind;
+	public static final field RAPID_ACCELERATION Lio/roadsignal/core/EventKind;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/roadsignal/core/EventKind;
+	public static fun values ()[Lio/roadsignal/core/EventKind;
+}
+
+public final class io/roadsignal/core/MotionSample {
+	public fun <init> (JDDLjava/lang/Double;Ljava/lang/Double;DZD)V
+	public synthetic fun <init> (JDDLjava/lang/Double;Ljava/lang/Double;DZDILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()J
+	public final fun component2 ()D
+	public final fun component3 ()D
+	public final fun component4 ()Ljava/lang/Double;
+	public final fun component5 ()Ljava/lang/Double;
+	public final fun component6 ()D
+	public final fun component7 ()Z
+	public final fun component8 ()D
+	public final fun copy (JDDLjava/lang/Double;Ljava/lang/Double;DZD)Lio/roadsignal/core/MotionSample;
+	public static synthetic fun copy$default (Lio/roadsignal/core/MotionSample;JDDLjava/lang/Double;Ljava/lang/Double;DZDILjava/lang/Object;)Lio/roadsignal/core/MotionSample;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAccuracyMeters ()D
+	public final fun getAngularVelocityRadPerSec ()D
+	public final fun getElapsedMs ()J
+	public final fun getLatitude ()Ljava/lang/Double;
+	public final fun getLinearAccelerationMps2 ()D
+	public final fun getLongitude ()Ljava/lang/Double;
+	public final fun getSimulatedPhoneHandling ()Z
+	public final fun getSpeedMps ()D
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/roadsignal/core/PolicyGate {
+	public fun <init> ()V
+	public fun <init> (J)V
+	public synthetic fun <init> (JILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun validate (Lio/roadsignal/core/CapturePolicy;J)Ljava/lang/String;
+}
+
+public final class io/roadsignal/core/PowerModel {
+	public static final field INSTANCE Lio/roadsignal/core/PowerModel;
+	public static final fun compare (JLio/roadsignal/core/PowerProfile;)Lio/roadsignal/core/WakeLockComparison;
+}
+
+public final class io/roadsignal/core/PowerProfile : java/lang/Enum {
+	public static final field BALANCED Lio/roadsignal/core/PowerProfile;
+	public static final field ECONOMY Lio/roadsignal/core/PowerProfile;
+	public static final field RESPONSIVE Lio/roadsignal/core/PowerProfile;
+	public final fun getBatchLatencyUs ()I
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public final fun getLocationIntervalMs ()J
+	public final fun getSensorHz ()I
+	public static fun valueOf (Ljava/lang/String;)Lio/roadsignal/core/PowerProfile;
+	public static fun values ()[Lio/roadsignal/core/PowerProfile;
+}
+
+public final class io/roadsignal/core/RecordingState : java/lang/Enum {
+	public static final field ARMED Lio/roadsignal/core/RecordingState;
+	public static final field CANDIDATE Lio/roadsignal/core/RecordingState;
+	public static final field RECORDING Lio/roadsignal/core/RecordingState;
+	public static final field SETTLING Lio/roadsignal/core/RecordingState;
+	public static final field STOPPED Lio/roadsignal/core/RecordingState;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/roadsignal/core/RecordingState;
+	public static fun values ()[Lio/roadsignal/core/RecordingState;
+}
+
+public final class io/roadsignal/core/ReplayScenario : java/lang/Enum {
+	public static final field COMMUTE Lio/roadsignal/core/ReplayScenario;
+	public static final field IMPACT Lio/roadsignal/core/ReplayScenario;
+	public static final field PASSENGER Lio/roadsignal/core/ReplayScenario;
+	public static final field SENSOR_GAP Lio/roadsignal/core/ReplayScenario;
+	public final fun getDescription ()Ljava/lang/String;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public final fun getTitle ()Ljava/lang/String;
+	public final fun samples ()Ljava/util/List;
+	public static fun valueOf (Ljava/lang/String;)Lio/roadsignal/core/ReplayScenario;
+	public static fun values ()[Lio/roadsignal/core/ReplayScenario;
+}
+
+public final class io/roadsignal/core/RetryPolicy {
+	public static final field INSTANCE Lio/roadsignal/core/RetryPolicy;
+	public static final fun decide (Lio/roadsignal/core/DeliveryResult;I)Lio/roadsignal/core/DeliveryAction;
+}
+
+public final class io/roadsignal/core/RoutePoint {
+	public fun <init> (DD)V
+	public final fun component1 ()D
+	public final fun component2 ()D
+	public final fun copy (DD)Lio/roadsignal/core/RoutePoint;
+	public static synthetic fun copy$default (Lio/roadsignal/core/RoutePoint;DDILjava/lang/Object;)Lio/roadsignal/core/RoutePoint;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getLatitude ()D
+	public final fun getLongitude ()D
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/roadsignal/core/SourceMode : java/lang/Enum {
+	public static final field DEVICE Lio/roadsignal/core/SourceMode;
+	public static final field REPLAY Lio/roadsignal/core/SourceMode;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/roadsignal/core/SourceMode;
+	public static fun values ()[Lio/roadsignal/core/SourceMode;
+}
+
+public final class io/roadsignal/core/TripEnd : java/lang/Enum {
+	public static final field DATA_GAP Lio/roadsignal/core/TripEnd;
+	public static final field STATIONARY Lio/roadsignal/core/TripEnd;
+	public static final field USER_STOP Lio/roadsignal/core/TripEnd;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/roadsignal/core/TripEnd;
+	public static fun values ()[Lio/roadsignal/core/TripEnd;
+}
+
+public final class io/roadsignal/core/TripEngine {
+	public fun <init> ()V
+	public fun <init> (Lio/roadsignal/core/EngineConfig;Lio/roadsignal/core/SourceMode;)V
+	public synthetic fun <init> (Lio/roadsignal/core/EngineConfig;Lio/roadsignal/core/SourceMode;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun accept (Lio/roadsignal/core/MotionSample;)Lio/roadsignal/core/EngineUpdate;
+	public final fun arm ()V
+	public final fun getAcceptedSamples ()J
+	public final fun getRejectedSamples ()J
+	public final fun getState ()Lio/roadsignal/core/RecordingState;
+	public final fun stop ()Lio/roadsignal/core/TripSummary;
+}
+
+public final class io/roadsignal/core/TripRole : java/lang/Enum {
+	public static final field DRIVER Lio/roadsignal/core/TripRole;
+	public static final field PASSENGER Lio/roadsignal/core/TripRole;
+	public static final field UNCLASSIFIED Lio/roadsignal/core/TripRole;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/roadsignal/core/TripRole;
+	public static fun values ()[Lio/roadsignal/core/TripRole;
+}
+
+public final class io/roadsignal/core/TripSummary {
+	public fun <init> (Ljava/lang/String;JJDDLjava/util/List;Ljava/util/List;Lio/roadsignal/core/TripEnd;Lio/roadsignal/core/TripRole;Lio/roadsignal/core/SourceMode;)V
+	public synthetic fun <init> (Ljava/lang/String;JJDDLjava/util/List;Ljava/util/List;Lio/roadsignal/core/TripEnd;Lio/roadsignal/core/TripRole;Lio/roadsignal/core/SourceMode;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component10 ()Lio/roadsignal/core/SourceMode;
+	public final fun component2 ()J
+	public final fun component3 ()J
+	public final fun component4 ()D
+	public final fun component5 ()D
+	public final fun component6 ()Ljava/util/List;
+	public final fun component7 ()Ljava/util/List;
+	public final fun component8 ()Lio/roadsignal/core/TripEnd;
+	public final fun component9 ()Lio/roadsignal/core/TripRole;
+	public final fun copy (Ljava/lang/String;JJDDLjava/util/List;Ljava/util/List;Lio/roadsignal/core/TripEnd;Lio/roadsignal/core/TripRole;Lio/roadsignal/core/SourceMode;)Lio/roadsignal/core/TripSummary;
+	public static synthetic fun copy$default (Lio/roadsignal/core/TripSummary;Ljava/lang/String;JJDDLjava/util/List;Ljava/util/List;Lio/roadsignal/core/TripEnd;Lio/roadsignal/core/TripRole;Lio/roadsignal/core/SourceMode;ILjava/lang/Object;)Lio/roadsignal/core/TripSummary;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCoachingScore ()I
+	public final fun getDistanceMeters ()D
+	public final fun getEndElapsedMs ()J
+	public final fun getEndReason ()Lio/roadsignal/core/TripEnd;
+	public final fun getEvents ()Ljava/util/List;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getMaxSpeedMps ()D
+	public final fun getRole ()Lio/roadsignal/core/TripRole;
+	public final fun getRoute ()Ljava/util/List;
+	public final fun getSource ()Lio/roadsignal/core/SourceMode;
+	public final fun getStartElapsedMs ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/roadsignal/core/WakeLockComparison {
+	public fun <init> (JJII)V
+	public final fun component1 ()J
+	public final fun component2 ()J
+	public final fun component3 ()I
+	public final fun component4 ()I
+	public final fun copy (JJII)Lio/roadsignal/core/WakeLockComparison;
+	public static synthetic fun copy$default (Lio/roadsignal/core/WakeLockComparison;JJIIILjava/lang/Object;)Lio/roadsignal/core/WakeLockComparison;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getLegacyOwnedMillis ()J
+	public final fun getProposedOwnedMillis ()J
+	public final fun getRequestedBatchLatencyUs ()I
+	public final fun getRequestedSensorHz ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
